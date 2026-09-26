@@ -5,127 +5,17 @@ on:
   push:
     branches: [main]
 
+env:
+  # CI-safe defaults (real values should be set in GitHub Secrets for production deploys)
+  POSTGRES_URL: ${{ secrets.POSTGRES_URL || 'postgresql://postgres:postgres@localhost:5432/payload' }}
+  PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET || 'ci-test-secret-min-32-chars-long' }}
+  BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN || 'ci-test-token' }}
+  PREVIEW_SECRET: ${{ secrets.PREVIEW_SECRET || 'ci-preview-secret' }}
+  CRON_SECRET: ${{ secrets.CRON_SECRET || 'ci-cron-secret' }}
+  NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+  NODE_OPTIONS: --no-deprecation
+
 jobs:
-  accessibility:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        run: pnpm build
-        env:
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
-          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          PREVIEW_SECRET: ${{ secrets.PREVIEW_SECRET }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          NEXT_PUBLIC_SERVER_URL: http://localhost:3000
-      - name: Start dev server
-        run: |
-          pnpm dev &
-          sleep 30
-      - name: axe-core (RGAA-mappable rules)
-        run: npx @axe-core/cli http://localhost:3000 --tags wcag2a,wcag2aa,wcag22aa --exit
-      - name: pa11y multi-locale
-        run: |
-          for locale in fr en de es; do
-            echo "Testing locale: $locale"
-            npx pa11y http://localhost:3000/$locale --standard WCAG2AA --level error
-          done
-
-  lighthouse:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        run: pnpm build
-        env:
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
-          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          PREVIEW_SECRET: ${{ secrets.PREVIEW_SECRET }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          NEXT_PUBLIC_SERVER_URL: http://localhost:3000
-      - name: Start dev server
-        run: |
-          pnpm dev &
-          sleep 30
-      - name: Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v11
-        with:
-          urls: |
-            http://localhost:3000/fr
-            http://localhost:3000/en
-          configPath: ./lighthouserc.json
-          uploadArtifacts: true
-
-  schema-validation:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        run: pnpm build
-        env:
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
-          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          PREVIEW_SECRET: ${{ secrets.PREVIEW_SECRET }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          NEXT_PUBLIC_SERVER_URL: http://localhost:3000
-      - name: Start dev server
-        run: |
-          pnpm dev &
-          sleep 30
-      - name: JSON-LD Schema Validation
-        run: npx structured-data-testing-tool http://localhost:3000/fr --schemas Article,FAQPage,BreadcrumbList,WebPage
-
-  llms-txt:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        run: pnpm build
-        env:
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
-          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          PREVIEW_SECRET: ${{ secrets.PREVIEW_SECRET }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          NEXT_PUBLIC_SERVER_URL: http://localhost:3000
-      - name: Start dev server
-        run: |
-          pnpm dev &
-          sleep 30
-      - name: llms.txt reachability
-        run: curl -sf http://localhost:3000/llms.txt > /dev/null
-
   lint-and-typecheck:
     runs-on: ubuntu-latest
     steps:
@@ -141,6 +31,161 @@ jobs:
         run: pnpm lint
       - name: TypeScript check
         run: pnpm exec tsc --noEmit
+
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: payload
+        ports: [5432:5432]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Generate types
+        run: pnpm generate:types
+      - name: Build
+        run: pnpm build
+        env:
+          POSTGRES_URL: postgresql://postgres:postgres@localhost:5432/payload
+
+  dev-server:
+    runs-on: ubuntu-latest
+    needs: build
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: payload
+        ports: [5432:5432]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Start dev server
+        run: |
+          pnpm dev > dev-server.log 2>&1 &
+          echo $! > dev-server.pid
+          # Wait for server to be ready
+          for i in {1..60}; do
+            if curl -sf http://localhost:3000 > /dev/null; then
+              echo "Dev server ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Dev server failed to start"
+          cat dev-server.log
+          exit 1
+      - name: Keep server running for dependent jobs
+        run: sleep 300
+        # This job stays alive for 5 minutes to serve other jobs
+
+  accessibility:
+    runs-on: ubuntu-latest
+    needs: dev-server
+    steps:
+      - name: Wait for dev server
+        run: |
+          for i in {1..30}; do
+            if curl -sf http://localhost:3000 > /dev/null; then
+              echo "Dev server accessible"
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+      - name: axe-core (RGAA-mappable rules)
+        run: npx @axe-core/cli http://localhost:3000 --tags wcag2a,wcag2aa,wcag22aa --exit
+      - name: pa11y multi-locale
+        run: |
+          for locale in fr en de es; do
+            echo "Testing locale: $locale"
+            npx pa11y http://localhost:3000/$locale --standard WCAG2AA --level error
+          done
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    needs: dev-server
+    steps:
+      - name: Wait for dev server
+        run: |
+          for i in {1..30}; do
+            if curl -sf http://localhost:3000 > /dev/null; then
+              echo "Dev server accessible"
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: |
+            http://localhost:3000/fr
+            http://localhost:3000/en
+          configPath: ./lighthouserc.json
+          uploadArtifacts: true
+
+  schema-validation:
+    runs-on: ubuntu-latest
+    needs: dev-server
+    steps:
+      - name: Wait for dev server
+        run: |
+          for i in {1..30}; do
+            if curl -sf http://localhost:3000 > /dev/null; then
+              echo "Dev server accessible"
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+      - name: JSON-LD Schema Validation
+        run: npx structured-data-testing-tool http://localhost:3000/fr --schemas Article,FAQPage,BreadcrumbList,WebPage
+
+  llms-txt:
+    runs-on: ubuntu-latest
+    needs: dev-server
+    steps:
+      - name: Wait for dev server
+        run: |
+          for i in {1..30}; do
+            if curl -sf http://localhost:3000 > /dev/null; then
+              echo "Dev server accessible"
+              exit 0
+            fi
+            sleep 2
+          done
+          exit 1
+      - name: llms.txt reachability
+        run: curl -sf http://localhost:3000/llms.txt > /dev/null
 
   tests:
     runs-on: ubuntu-latest
