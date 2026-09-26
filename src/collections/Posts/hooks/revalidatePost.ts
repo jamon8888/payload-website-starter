@@ -7,37 +7,42 @@ import type { Post } from '../../../payload-types'
 export const revalidatePost: CollectionAfterChangeHook<Post> = ({
   doc,
   previousDoc,
-  req: { payload, context },
+  req: { payload, context, locale },
 }) => {
   if (!context.disableRevalidate) {
+    const currentLocale = locale || 'en'
+    const localePrefix = currentLocale === 'en' ? '' : `/${currentLocale}`
+
     if (doc._status === 'published') {
-      const path = `/posts/${doc.slug}`
+      const path = `${localePrefix}/posts/${doc.slug}`
 
       payload.logger.info(`Revalidating post at path: ${path}`)
 
       revalidatePath(path)
-      revalidateTag('posts-sitemap', 'max')
+      revalidateTag(`posts-sitemap_${currentLocale}`, 'max')
     }
 
     // If the post was previously published, we need to revalidate the old path
     if (previousDoc._status === 'published' && doc._status !== 'published') {
-      const oldPath = `/posts/${previousDoc.slug}`
+      const oldPath = `${localePrefix}/posts/${previousDoc.slug}`
 
       payload.logger.info(`Revalidating old post at path: ${oldPath}`)
 
       revalidatePath(oldPath)
-      revalidateTag('posts-sitemap', 'max')
+      revalidateTag(`posts-sitemap_${currentLocale}`, 'max')
     }
   }
   return doc
 }
 
-export const revalidateDelete: CollectionAfterDeleteHook<Post> = ({ doc, req: { context } }) => {
+export const revalidateDelete: CollectionAfterDeleteHook<Post> = ({ doc, req: { context, locale } }) => {
   if (!context.disableRevalidate) {
-    const path = `/posts/${doc?.slug}`
+    const currentLocale = locale || 'en'
+    const localePrefix = currentLocale === 'en' ? '' : `/${currentLocale}`
+    const path = `${localePrefix}/posts/${doc?.slug}`
 
     revalidatePath(path)
-    revalidateTag('posts-sitemap', 'max')
+    revalidateTag(`posts-sitemap_${currentLocale}`, 'max')
   }
 
   return doc

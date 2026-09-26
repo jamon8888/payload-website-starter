@@ -2,6 +2,17 @@ import type { Field, GroupField } from 'payload'
 
 import deepMerge from '@/utilities/deepMerge'
 
+const GENERIC_LINK_LABELS = [
+  'cliquez ici',
+  'en savoir plus',
+  'lire la suite',
+  'ici',
+  'click here',
+  'read more',
+  'learn more',
+  'here',
+]
+
 export type LinkAppearances = 'default' | 'outline'
 
 export const appearanceOptions: Record<LinkAppearances, { label: string; value: string }> = {
@@ -19,7 +30,7 @@ type LinkType = (options?: {
   appearances?: LinkAppearances[] | false
   disableLabel?: boolean
   overrides?: Partial<GroupField>
-}) => Field
+}) => GroupField
 
 export const link: LinkType = ({ appearances, disableLabel = false, overrides = {} } = {}) => {
   const linkResult: GroupField = {
@@ -27,6 +38,22 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
     type: 'group',
     admin: {
       hideGutter: true,
+    },
+    hooks: {
+      beforeValidate: [
+        ({ data }) => {
+          const label = data?.label
+          if (label) {
+            const normalized = label.trim().toLowerCase()
+            if (GENERIC_LINK_LABELS.includes(normalized)) {
+              throw new Error(
+                'Intitulé de lien non explicite hors contexte — RGAA 6.1/6.2'
+              )
+            }
+          }
+          return data
+        },
+      ],
     },
     fields: [
       {
@@ -42,11 +69,19 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
             defaultValue: 'reference',
             options: [
               {
-                label: 'Internal link',
+                label: {
+                  en: 'Internal link',
+                  es: 'Enlace interno',
+                  fr: 'Lien interne',
+                },
                 value: 'reference',
               },
               {
-                label: 'Custom URL',
+                label: {
+                  en: 'Custom URL',
+                  es: 'URL personalizada',
+                  fr: 'URL personnalisée',
+                },
                 value: 'custom',
               },
             ],
@@ -60,7 +95,11 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
               },
               width: '50%',
             },
-            label: 'Open in new tab',
+            label: {
+              en: 'Open in new tab',
+              es: 'Abrir en nueva pestaña',
+              fr: 'Ouvrir dans un nouvel onglet',
+            },
           },
         ],
       },
@@ -74,7 +113,11 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
       admin: {
         condition: (_, siblingData) => siblingData?.type === 'reference',
       },
-      label: 'Document to link to',
+      label: {
+        en: 'Document to link to',
+        es: 'Documento para enlazar',
+        fr: 'Document à lier',
+      },
       relationTo: ['pages', 'posts'],
       required: true,
     },
@@ -84,7 +127,11 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
       admin: {
         condition: (_, siblingData) => siblingData?.type === 'custom',
       },
-      label: 'Custom URL',
+      label: {
+        en: 'Custom URL',
+        es: 'URL personalizada',
+        fr: 'URL personnalisée',
+      },
       required: true,
     },
   ]
@@ -108,7 +155,11 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
           admin: {
             width: '50%',
           },
-          label: 'Label',
+          label: {
+            en: 'Label',
+            es: 'Etiqueta',
+            fr: 'Libellé',
+          },
           required: true,
         },
       ],
@@ -128,7 +179,11 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
       name: 'appearance',
       type: 'select',
       admin: {
-        description: 'Choose how the link should be rendered.',
+        description: {
+          en: 'Choose how the link should be rendered.',
+          es: 'Elige cómo se debe renderizar el enlace.',
+          fr: 'Choisissez comment le lien doit être rendu.',
+        },
       },
       defaultValue: 'default',
       options: appearanceOptionsToUse,

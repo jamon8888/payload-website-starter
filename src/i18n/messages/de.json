@@ -1,0 +1,45 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "posts": "Beiträge",
+    "search": "Suchen"
+  },
+  "posts": {
+    "title": "Beiträge",
+    "readMore": "Weiterlesen",
+    "publishedOn": "Veröffentlicht am",
+    "by": "von",
+    "in": "in",
+    "relatedPosts": "Verwandte Beiträge"
+  },
+  "search": {
+    "title": "Suchen",
+    "placeholder": "Suchen...",
+    "noResults": "Keine Ergebnisse gefunden.",
+    "resultsFor": "Ergebnisse für"
+  },
+  "notFound": {
+    "title": "404",
+    "description": "Diese Seite konnte nicht gefunden werden.",
+    "goHome": "Zur Startseite"
+  },
+  "pageRange": {
+    "showing": "Zeige {{start}} - {{end}} von {{total}} {{type}}",
+    "noResults": "Die Suche ergab keine Ergebnisse."
+  },
+  "hero": {
+    "readMore": "Weiterlesen"
+  },
+  "pagination": {
+    "previous": "Zurück",
+    "next": "Weiter",
+    "page": "Seite"
+  },
+  "footer": {
+    "rights": "Alle Rechte vorbehalten."
+  },
+  "languageSwitcher": {
+    "label": "Sprache",
+    "ariaLabel": "Sprache auswählen"
+  }
+}

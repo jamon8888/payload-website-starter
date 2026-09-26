@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import React from 'react'
+import { Locale } from '@/i18n/config'
 import RichText from '@/components/RichText'
 
 import type { Post } from '@/payload-types'
@@ -11,10 +12,11 @@ export type RelatedPostsProps = {
   className?: string
   docs?: Post[]
   introContent?: DefaultTypedEditorState
+  locale?: Locale
 }
 
 export const RelatedPosts: React.FC<RelatedPostsProps> = (props) => {
-  const { className, docs, introContent } = props
+  const { className, docs, introContent, locale = 'en' } = props
 
   return (
     <div className={clsx('lg:container', className)}>
@@ -24,7 +26,7 @@ export const RelatedPosts: React.FC<RelatedPostsProps> = (props) => {
         {docs?.map((doc, index) => {
           if (typeof doc === 'string') return null
 
-          return <Card key={index} doc={doc} relationTo="posts" showCategories />
+          return <Card key={index} doc={doc} relationTo="posts" showCategories locale={locale} />
         })}
       </div>
     </div>

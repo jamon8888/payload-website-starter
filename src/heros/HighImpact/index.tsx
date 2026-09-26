@@ -3,12 +3,13 @@ import { useHeaderTheme } from '@/providers/HeaderTheme'
 import React, { useEffect } from 'react'
 
 import type { Page } from '@/payload-types'
+import { Locale } from '@/i18n/config'
 
 import { CMSLink } from '@/components/Link'
 import { Media } from '@/components/Media'
 import RichText from '@/components/RichText'
 
-export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText }) => {
+export const HighImpactHero: React.FC<Page['hero'] & { locale?: Locale }> = ({ links, media, richText, locale = 'en' }) => {
   const { setHeaderTheme } = useHeaderTheme()
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
               {links.map(({ link }, i) => {
                 return (
                   <li key={i}>
-                    <CMSLink {...link} />
+                    <CMSLink {...link} locale={locale} />
                   </li>
                 )
               })}

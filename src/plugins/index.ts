@@ -12,15 +12,21 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { defaultLocale } from '@/i18n/config'
 
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
+const generateTitle: GenerateTitle<Post | Page> = ({ doc, locale }) => {
+  const localeLabel = locale === defaultLocale ? '' : ` (${locale})`
+  return doc?.title ? `${doc.title} | Payload Website Template${localeLabel}` : `Payload Website Template${localeLabel}`
 }
 
-const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
+const generateURL: GenerateURL<Post | Page> = ({ doc, locale }) => {
   const url = getServerSideURL()
+  const localePrefix = locale === defaultLocale ? '' : `/${locale}`
+  // Infer collection from document structure: Pages have 'hero' and 'layout', Posts have 'heroImage', 'content', 'authors'
+  const isPost = 'heroImage' in (doc || {}) || 'authors' in (doc || {})
+  const collectionPrefix = isPost ? '/posts' : ''
 
-  return doc?.slug ? `${url}/${doc.slug}` : url
+  return doc?.slug ? `${url}${localePrefix}${collectionPrefix}/${doc.slug}` : `${url}${localePrefix}`
 }
 
 export const plugins: Plugin[] = [

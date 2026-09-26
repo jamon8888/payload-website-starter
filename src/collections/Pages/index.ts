@@ -23,6 +23,18 @@ import {
 
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
+  labels: {
+    singular: {
+      en: 'Page',
+      es: 'Página',
+      fr: 'Page',
+    },
+    plural: {
+      en: 'Pages',
+      es: 'Páginas',
+      fr: 'Pages',
+    },
+  },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -59,13 +71,23 @@ export const Pages: CollectionConfig<'pages'> = {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
+      label: {
+        en: 'Title',
+        es: 'Título',
+        fr: 'Titre',
+      },
     },
     {
       type: 'tabs',
       tabs: [
         {
           fields: [hero],
-          label: 'Hero',
+          label: {
+            en: 'Hero',
+            es: 'Hero',
+            fr: 'Héro',
+          },
         },
         {
           fields: [
@@ -74,16 +96,25 @@ export const Pages: CollectionConfig<'pages'> = {
               type: 'blocks',
               blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock],
               required: true,
+              localized: true,
               admin: {
                 initCollapsed: true,
               },
             },
           ],
-          label: 'Content',
+          label: {
+            en: 'Content',
+            es: 'Contenido',
+            fr: 'Contenu',
+          },
         },
         {
           name: 'meta',
-          label: 'SEO',
+          label: {
+            en: 'SEO',
+            es: 'SEO',
+            fr: 'SEO',
+          },
           fields: [
             OverviewField({
               titlePath: 'meta.title',
@@ -116,6 +147,11 @@ export const Pages: CollectionConfig<'pages'> = {
       admin: {
         position: 'sidebar',
       },
+      label: {
+        en: 'Published At',
+        es: 'Publicado el',
+        fr: 'Publié le',
+      },
     },
     slugField(),
   ],
@@ -130,6 +166,7 @@ export const Pages: CollectionConfig<'pages'> = {
         interval: 100, // We set this interval for optimal live preview
       },
       schedulePublish: true,
+      localizeStatus: true,
     },
     maxPerDoc: 50,
   },

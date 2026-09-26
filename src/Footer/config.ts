@@ -5,6 +5,11 @@ import { revalidateFooter } from './hooks/revalidateFooter'
 
 export const Footer: GlobalConfig = {
   slug: 'footer',
+  label: {
+    en: 'Footer',
+    es: 'Pie de página',
+    fr: 'Pied de page',
+  },
   access: {
     read: () => true,
   },
@@ -18,6 +23,12 @@ export const Footer: GlobalConfig = {
         }),
       ],
       maxRows: 6,
+      localized: true,
+      label: {
+        en: 'Navigation Items',
+        es: 'Elementos de navegación',
+        fr: 'Éléments de navigation',
+      },
       admin: {
         initCollapsed: true,
         components: {

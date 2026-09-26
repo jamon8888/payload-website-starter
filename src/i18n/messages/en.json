@@ -1,0 +1,45 @@
+{
+  "nav": {
+    "home": "Home",
+    "posts": "Posts",
+    "search": "Search"
+  },
+  "posts": {
+    "title": "Posts",
+    "readMore": "Read more",
+    "publishedOn": "Published on",
+    "by": "by",
+    "in": "in",
+    "relatedPosts": "Related posts"
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search...",
+    "noResults": "No results found.",
+    "resultsFor": "Results for"
+  },
+  "notFound": {
+    "title": "404",
+    "description": "This page could not be found.",
+    "goHome": "Go home"
+  },
+  "pageRange": {
+    "showing": "Showing {{start}} - {{end}} of {{total}} {{type}}",
+    "noResults": "Search produced no results."
+  },
+  "hero": {
+    "readMore": "Read more"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page"
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "ariaLabel": "Select language"
+  }
+}

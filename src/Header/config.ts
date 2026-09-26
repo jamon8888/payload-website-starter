@@ -5,6 +5,11 @@ import { revalidateHeader } from './hooks/revalidateHeader'
 
 export const Header: GlobalConfig = {
   slug: 'header',
+  label: {
+    en: 'Header',
+    es: 'Cabecera',
+    fr: 'En-tête',
+  },
   access: {
     read: () => true,
   },
@@ -18,6 +23,12 @@ export const Header: GlobalConfig = {
         }),
       ],
       maxRows: 6,
+      localized: true,
+      label: {
+        en: 'Navigation Items',
+        es: 'Elementos de navegación',
+        fr: 'Éléments de navigation',
+      },
       admin: {
         initCollapsed: true,
         components: {

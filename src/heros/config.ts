@@ -17,26 +17,47 @@ export const hero: Field = {
       name: 'type',
       type: 'select',
       defaultValue: 'lowImpact',
-      label: 'Type',
+      label: {
+        en: 'Type',
+        es: 'Tipo',
+        fr: 'Type',
+      },
       options: [
         {
-          label: 'None',
+          label: {
+            en: 'None',
+            es: 'Ninguno',
+            fr: 'Aucun',
+          },
           value: 'none',
         },
         {
-          label: 'High Impact',
+          label: {
+            en: 'High Impact',
+            es: 'Alto Impacto',
+            fr: 'Fort Impact',
+          },
           value: 'highImpact',
         },
         {
-          label: 'Medium Impact',
+          label: {
+            en: 'Medium Impact',
+            es: 'Impacto Medio',
+            fr: 'Impact Moyen',
+          },
           value: 'mediumImpact',
         },
         {
-          label: 'Low Impact',
+          label: {
+            en: 'Low Impact',
+            es: 'Bajo Impacto',
+            fr: 'Faible Impact',
+          },
           value: 'lowImpact',
         },
       ],
       required: true,
+      localized: true,
     },
     {
       name: 'richText',
@@ -52,6 +73,7 @@ export const hero: Field = {
         },
       }),
       label: false,
+      localized: true,
     },
     linkGroup({
       overrides: {
@@ -66,6 +88,11 @@ export const hero: Field = {
       },
       relationTo: 'media',
       required: true,
+      label: {
+        en: 'Media',
+        es: 'Medio',
+        fr: 'Média',
+      },
     },
   ],
   label: false,

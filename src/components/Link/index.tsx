@@ -4,12 +4,14 @@ import Link from 'next/link'
 import React from 'react'
 
 import type { Page, Post } from '@/payload-types'
+import { Locale } from '@/i18n/config'
 
 type CMSLinkType = {
   appearance?: 'inline' | ButtonProps['variant']
   children?: React.ReactNode
   className?: string
   label?: string | null
+  locale?: Locale
   newTab?: boolean | null
   reference?: {
     relationTo: 'pages' | 'posts'
@@ -27,15 +29,18 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
     children,
     className,
     label,
+    locale = 'en',
     newTab,
     reference,
     size: sizeFromProps,
     url,
   } = props
 
+  const localePrefix = locale === 'en' ? '' : `/${locale}`
+
   const href =
     type === 'reference' && typeof reference?.value === 'object' && reference.value.slug
-      ? `${reference?.relationTo !== 'pages' ? `/${reference?.relationTo}` : ''}/${
+      ? `${localePrefix}${reference?.relationTo !== 'pages' ? `/${reference?.relationTo}` : ''}/${
           reference.value.slug
         }`
       : url

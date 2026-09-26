@@ -15,6 +15,11 @@ import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+import { locales, defaultLocale } from './i18n/config'
+import { en } from '@payloadcms/translations/languages/en'
+import { de } from '@payloadcms/translations/languages/de'
+import { fr } from '@payloadcms/translations/languages/fr'
+import { es } from '@payloadcms/translations/languages/es'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -79,6 +84,18 @@ export default buildConfig({
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
+  },
+  localization: {
+    locales,
+    defaultLocale,
+    fallback: true,
+  },
+  i18n: {
+    supportedLanguages: { en, de, fr, es },
+    fallbackLanguage: defaultLocale,
+  },
+  experimental: {
+    localizeStatus: true,
   },
   jobs: {
     access: {

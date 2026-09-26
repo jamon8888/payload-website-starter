@@ -29,6 +29,18 @@ import { slugField } from 'payload'
 
 export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',
+  labels: {
+    singular: {
+      en: 'Post',
+      es: 'Artículo',
+      fr: 'Article',
+    },
+    plural: {
+      en: 'Posts',
+      es: 'Artículos',
+      fr: 'Articles',
+    },
+  },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -70,6 +82,12 @@ export const Posts: CollectionConfig<'posts'> = {
       name: 'title',
       type: 'text',
       required: true,
+      localized: true,
+      label: {
+        en: 'Title',
+        es: 'Título',
+        fr: 'Titre',
+      },
     },
     {
       type: 'tabs',
@@ -80,6 +98,11 @@ export const Posts: CollectionConfig<'posts'> = {
               name: 'heroImage',
               type: 'upload',
               relationTo: 'media',
+              label: {
+                en: 'Hero Image',
+                es: 'Imagen destacada',
+                fr: 'Image à la une',
+              },
             },
             {
               name: 'content',
@@ -98,9 +121,14 @@ export const Posts: CollectionConfig<'posts'> = {
               }),
               label: false,
               required: true,
+              localized: true,
             },
           ],
-          label: 'Content',
+          label: {
+            en: 'Content',
+            es: 'Contenido',
+            fr: 'Contenu',
+          },
         },
         {
           fields: [
@@ -119,6 +147,12 @@ export const Posts: CollectionConfig<'posts'> = {
               },
               hasMany: true,
               relationTo: 'posts',
+              localized: true,
+              label: {
+                en: 'Related Posts',
+                es: 'Artículos relacionados',
+                fr: 'Articles connexes',
+              },
             },
             {
               name: 'categories',
@@ -128,13 +162,27 @@ export const Posts: CollectionConfig<'posts'> = {
               },
               hasMany: true,
               relationTo: 'categories',
+              localized: true,
+              label: {
+                en: 'Categories',
+                es: 'Categorías',
+                fr: 'Catégories',
+              },
             },
           ],
-          label: 'Meta',
+          label: {
+            en: 'Meta',
+            es: 'Meta',
+            fr: 'Méta',
+          },
         },
         {
           name: 'meta',
-          label: 'SEO',
+          label: {
+            en: 'SEO',
+            es: 'SEO',
+            fr: 'SEO',
+          },
           fields: [
             OverviewField({
               titlePath: 'meta.title',
@@ -179,6 +227,11 @@ export const Posts: CollectionConfig<'posts'> = {
             return value
           },
         ],
+      },
+      label: {
+        en: 'Published At',
+        es: 'Publicado el',
+        fr: 'Publié le',
       },
     },
     {
@@ -227,6 +280,7 @@ export const Posts: CollectionConfig<'posts'> = {
         interval: 100, // We set this interval for optimal live preview
       },
       schedulePublish: true,
+      localizeStatus: true,
     },
     maxPerDoc: 50,
   },

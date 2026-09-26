@@ -11,15 +11,18 @@ import {
 import { cn } from '@/utilities/ui'
 import { useRouter } from 'next/navigation'
 import React from 'react'
+import { Locale } from '@/i18n/config'
 
 export const Pagination: React.FC<{
   className?: string
   page: number
   totalPages: number
+  locale?: Locale
 }> = (props) => {
   const router = useRouter()
 
-  const { className, page, totalPages } = props
+  const { className, page, totalPages, locale = 'en' } = props
+  const localePrefix = locale === 'en' ? '' : `/${locale}`
   const hasNextPage = page < totalPages
   const hasPrevPage = page > 1
 
@@ -34,7 +37,7 @@ export const Pagination: React.FC<{
             <PaginationPrevious
               disabled={!hasPrevPage}
               onClick={() => {
-                router.push(`/posts/page/${page - 1}`)
+                router.push(`${localePrefix}/posts/page/${page - 1}`)
               }}
             />
           </PaginationItem>
@@ -49,7 +52,7 @@ export const Pagination: React.FC<{
             <PaginationItem>
               <PaginationLink
                 onClick={() => {
-                  router.push(`/posts/page/${page - 1}`)
+                  router.push(`${localePrefix}/posts/page/${page - 1}`)
                 }}
               >
                 {page - 1}
@@ -61,7 +64,7 @@ export const Pagination: React.FC<{
             <PaginationLink
               isActive
               onClick={() => {
-                router.push(`/posts/page/${page}`)
+                router.push(`${localePrefix}/posts/page/${page}`)
               }}
             >
               {page}
@@ -72,7 +75,7 @@ export const Pagination: React.FC<{
             <PaginationItem>
               <PaginationLink
                 onClick={() => {
-                  router.push(`/posts/page/${page + 1}`)
+                  router.push(`${localePrefix}/posts/page/${page + 1}`)
                 }}
               >
                 {page + 1}
@@ -90,7 +93,7 @@ export const Pagination: React.FC<{
             <PaginationNext
               disabled={!hasNextPage}
               onClick={() => {
-                router.push(`/posts/page/${page + 1}`)
+                router.push(`${localePrefix}/posts/page/${page + 1}`)
               }}
             />
           </PaginationItem>

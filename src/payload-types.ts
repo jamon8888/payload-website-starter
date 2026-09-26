@@ -108,7 +108,8 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale:
+    ('false' | 'none' | 'null') | false | null | ('en' | 'de' | 'fr' | 'es') | ('en' | 'de' | 'fr' | 'es')[];
   globals: {
     header: Header;
     footer: Footer;
@@ -117,7 +118,7 @@ export interface Config {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
   };
-  locale: null;
+  locale: 'en' | 'de' | 'fr' | 'es';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -276,6 +277,13 @@ export interface Post {
  */
 export interface Media {
   id: number;
+  /**
+   * Informative images require alt text. Decorative images are ignored by screen readers.
+   */
+  role: 'informative' | 'decorative';
+  /**
+   * Required for informative images. Leave empty for decorative images.
+   */
   alt?: string | null;
   caption?: {
     root: {
@@ -292,7 +300,6 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
-  _objectKey?: string | null;
   folder?: (number | null) | FolderInterface;
   updatedAt: string;
   createdAt: string;
@@ -544,7 +551,14 @@ export interface ContentBlock {
  * via the `definition` "MediaBlock".
  */
 export interface MediaBlock {
-  media: number | Media;
+  image: {
+    asset: number | Media;
+    role: 'informative' | 'decorative';
+    /**
+     * Required for informative images. Leave empty for decorative images.
+     */
+    alt?: string | null;
+  };
   id?: string | null;
   blockName?: string | null;
   blockType: 'mediaBlock';
@@ -1152,7 +1166,13 @@ export interface ContentBlockSelect<T extends boolean = true> {
  * via the `definition` "MediaBlock_select".
  */
 export interface MediaBlockSelect<T extends boolean = true> {
-  media?: T;
+  image?:
+    | T
+    | {
+        asset?: T;
+        role?: T;
+        alt?: T;
+      };
   id?: T;
   blockName?: T;
 }
@@ -1217,9 +1237,9 @@ export interface PostsSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  role?: T;
   alt?: T;
   caption?: T;
-  _objectKey?: T;
   folder?: T;
   updatedAt?: T;
   createdAt?: T;
