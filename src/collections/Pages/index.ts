@@ -21,6 +21,8 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
+import { aeoSummaryField, answerBlocksField } from '@/fields/aeo'
+
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
   labels: {
@@ -138,6 +140,15 @@ export const Pages: CollectionConfig<'pages'> = {
               descriptionPath: 'meta.description',
             }),
           ],
+        },
+        {
+          name: 'aeo',
+          label: {
+            en: 'AEO / GEO',
+            es: 'AEO / GEO',
+            fr: 'AEO / GEO',
+          },
+          fields: [aeoSummaryField, answerBlocksField],
         },
       ],
     },

@@ -113,10 +113,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    'accessibility-statement': AccessibilityStatement;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'accessibility-statement': AccessibilityStatementSelect<false> | AccessibilityStatementSelect<true>;
   };
   locale: 'en' | 'de' | 'fr' | 'es';
   widgets: {
@@ -211,6 +213,23 @@ export interface Page {
     image?: (number | null) | Media;
     description?: string | null;
   };
+  aeo: {
+    /**
+     * Concise summary used for llms.txt, SpeakableSpecification, and AI citations. Must be self-contained.
+     */
+    aeoSummary: string;
+    /**
+     * Each block is a standalone Q&A pair that AI engines can cite directly.
+     */
+    answerBlocks?:
+      | {
+          question: string;
+          answer: string;
+          sourceLink?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
   publishedAt?: string | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
@@ -253,6 +272,23 @@ export interface Post {
      */
     image?: (number | null) | Media;
     description?: string | null;
+  };
+  aeo: {
+    /**
+     * Concise summary used for llms.txt, SpeakableSpecification, and AI citations. Must be self-contained.
+     */
+    aeoSummary: string;
+    /**
+     * Each block is a standalone Q&A pair that AI engines can cite directly.
+     */
+    answerBlocks?:
+      | {
+          question: string;
+          answer: string;
+          sourceLink?: string | null;
+          id?: string | null;
+        }[]
+      | null;
   };
   publishedAt?: string | null;
   authors?: (number | User)[] | null;
@@ -1104,6 +1140,19 @@ export interface PagesSelect<T extends boolean = true> {
         image?: T;
         description?: T;
       };
+  aeo?:
+    | T
+    | {
+        aeoSummary?: T;
+        answerBlocks?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              sourceLink?: T;
+              id?: T;
+            };
+      };
   publishedAt?: T;
   generateSlug?: T;
   slug?: T;
@@ -1217,6 +1266,19 @@ export interface PostsSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+      };
+  aeo?:
+    | T
+    | {
+        aeoSummary?: T;
+        answerBlocks?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              sourceLink?: T;
+              id?: T;
+            };
       };
   publishedAt?: T;
   authors?: T;
@@ -1706,6 +1768,30 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accessibility-statement".
+ */
+export interface AccessibilityStatement {
+  id: number;
+  auditDate: string;
+  referentielVersion: string;
+  globalComplianceRate: number;
+  nonConformCriteria?:
+    | {
+        criterion: string;
+        thematic: string;
+        derogation?: boolean | null;
+        justification?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  contactEmail: string;
+  schemaPluriannuelUrl?: string | null;
+  planActionAnnuelUrl?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -1746,6 +1832,30 @@ export interface FooterSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accessibility-statement_select".
+ */
+export interface AccessibilityStatementSelect<T extends boolean = true> {
+  auditDate?: T;
+  referentielVersion?: T;
+  globalComplianceRate?: T;
+  nonConformCriteria?:
+    | T
+    | {
+        criterion?: T;
+        thematic?: T;
+        derogation?: T;
+        justification?: T;
+        id?: T;
+      };
+  contactEmail?: T;
+  schemaPluriannuelUrl?: T;
+  planActionAnnuelUrl?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

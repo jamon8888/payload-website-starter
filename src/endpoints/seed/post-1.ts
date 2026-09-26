@@ -309,6 +309,19 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
       image: heroImage.id,
       title: 'Digital Horizons: A Glimpse into Tomorrow',
     },
+    aeo: {
+      aeoSummary: 'Article exploring AI, machine learning, and IoT technologies reshaping industries and daily life.',
+      answerBlocks: [
+        {
+          question: 'How is AI transforming industries?',
+          answer: 'AI is optimizing operations and pioneering innovative approaches by making decisions previously left to human intuition, reshaping industries at unprecedented pace.',
+        },
+        {
+          question: 'What is the Internet of Things (IoT)?',
+          answer: 'IoT is the seamless integration of devices and systems allowing them to communicate and collaborate, transforming homes with smart systems and transportation with connected cars.',
+        },
+      ],
+    },
     relatedPosts: [], // this is populated by the seed script
     title: 'Digital Horizons: A Glimpse into Tomorrow',
   }

@@ -27,6 +27,8 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from 'payload'
 
+import { aeoSummaryField, answerBlocksField } from '@/fields/aeo'
+
 export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',
   labels: {
@@ -206,6 +208,15 @@ export const Posts: CollectionConfig<'posts'> = {
               descriptionPath: 'meta.description',
             }),
           ],
+        },
+        {
+          name: 'aeo',
+          label: {
+            en: 'AEO / GEO',
+            es: 'AEO / GEO',
+            fr: 'AEO / GEO',
+          },
+          fields: [aeoSummaryField, answerBlocksField],
         },
       ],
     },

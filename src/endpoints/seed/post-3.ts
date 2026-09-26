@@ -262,6 +262,19 @@ export const post3: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
       image: heroImage.id,
       title: 'Dollar and Sense: The Financial Forecast',
     },
+    aeo: {
+      aeoSummary: 'Financial article on money as a language, stock market dynamics, bull/bear markets, and investor psychology.',
+      answerBlocks: [
+        {
+          question: 'What drives stock market trends?',
+          answer: 'Stock market trends are driven by both economics and human behavior - optimism (bullish) meets caution (bearish) with traders weighing hope against fear.',
+        },
+        {
+          question: 'How does money function as a language?',
+          answer: 'Money transcends currency to become a language of value, trust, and societal structures with nuances requiring discerning understanding, where strategy meets intuition.',
+        },
+      ],
+    },
     relatedPosts: [], // this is populated by the seed script
     title: 'Dollar and Sense: The Financial Forecast',
   }

@@ -669,6 +669,19 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
         },
       },
     ],
+    aeo: {
+      aeoSummary: 'Open-source website template built with Payload CMS and Next.js 16, featuring a modern admin dashboard, preview, SEO, and dark mode.',
+      answerBlocks: [
+        {
+          question: 'What is this website template built with?',
+          answer: 'This template is built with Payload CMS and Next.js 16, using the App Router and Server Components.',
+        },
+        {
+          question: 'What features does the admin dashboard include?',
+          answer: 'The admin dashboard includes live preview, version history, draft/published workflow, SEO management, and dark mode support.',
+        },
+      ],
+    },
     meta: {
       description: 'An open-source website built with Payload and Next.js.',
       image: heroImage.id,

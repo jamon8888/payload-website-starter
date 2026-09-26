@@ -226,6 +226,19 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
       image: heroImage.id,
       title: 'Global Gaze: Beyond the Headlines',
     },
+    aeo: {
+      aeoSummary: 'Article on human resilience and community recovery after natural disasters, political unrest, and economic crises.',
+      answerBlocks: [
+        {
+          question: 'How do communities recover after disasters?',
+          answer: 'Communities recover through solidarity - neighbors forming rescue teams, cities rallying to rebuild, and collective purpose turning adversity into growth.',
+        },
+        {
+          question: 'What role does human spirit play in crisis?',
+          answer: 'The indomitable human spirit emerges as an underestimated force during crises, driving survival, unity, and the ability to overcome challenges together.',
+        },
+      ],
+    },
     relatedPosts: [], // this is populated by the seed script
     title: 'Global Gaze: Beyond the Headlines',
   }

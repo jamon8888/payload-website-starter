@@ -51,6 +51,15 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
         },
       },
     ],
+    aeo: {
+      aeoSummary: 'Contact page with a form for reaching out to the website administrators.',
+      answerBlocks: [
+        {
+          question: 'How can I contact the website administrators?',
+          answer: 'Use the contact form on this page to send a message to the website administrators.',
+        },
+      ],
+    },
     title: 'Contact',
   }
 }

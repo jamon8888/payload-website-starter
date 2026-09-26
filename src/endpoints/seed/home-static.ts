@@ -83,6 +83,10 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
     description: 'An open-source website built with Payload and Next.js.',
     title: 'Payload Website Template',
   },
+  aeo: {
+    aeoSummary: 'Open-source website template built with Payload CMS and Next.js.',
+    answerBlocks: [],
+  },
   title: 'Home',
   layout: [],
 }
