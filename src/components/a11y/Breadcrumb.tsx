@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import { cn } from '@/utilities/ui'
 import { ChevronRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface BreadcrumbItem {
   label: string
@@ -18,9 +19,11 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   items,
   className,
 }) => {
+  const t = useTranslations('a11y')
+
   return (
     <nav
-      aria-label="Fil d'Ariane"
+      aria-label={t('breadcrumb')}
       className={cn('flex items-center space-x-2 text-sm', className)}
     >
       <ol className="flex items-center space-x-2">

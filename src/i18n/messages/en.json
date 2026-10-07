@@ -14,6 +14,7 @@
   },
   "search": {
     "title": "Search",
+    "label": "Search",
     "placeholder": "Search...",
     "noResults": "No results found.",
     "resultsFor": "Results for"
@@ -24,7 +25,7 @@
     "goHome": "Go home"
   },
   "pageRange": {
-    "showing": "Showing {{start}} - {{end}} of {{total}} {{type}}",
+    "showing": "Showing {start} - {end} of {total} {type}",
     "noResults": "Search produced no results."
   },
   "hero": {
@@ -33,7 +34,11 @@
   "pagination": {
     "previous": "Previous",
     "next": "Next",
-    "page": "Page"
+    "page": "Page",
+    "ariaLabel": "pagination",
+    "goToPreviousPage": "Go to previous page",
+    "goToNextPage": "Go to next page",
+    "morePages": "More pages"
   },
   "footer": {
     "rights": "All rights reserved."
@@ -41,5 +46,50 @@
   "languageSwitcher": {
     "label": "Language",
     "ariaLabel": "Select language"
+  },
+  "common": {
+    "noImage": "No image",
+    "untitledCategory": "Untitled category",
+    "selectTheme": "Select a theme",
+    "theme": "Theme",
+    "auto": "Auto",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "mainNavigation": "Main navigation",
+    "footerNavigation": "Footer navigation",
+    "newWindow": "(new window)",
+    "breadcrumb": "Breadcrumb",
+    "close": "Close"
+  },
+  "accessibility": {
+    "metaTitle": "Accessibility Statement",
+    "title": "Accessibility Statement",
+    "intro": "This accessibility statement applies to this website.",
+    "complianceStatus": "Compliance Status",
+    "referenceStandard": "Reference Standard",
+    "auditDate": "Audit Date",
+    "globalComplianceRate": "Global Compliance Rate",
+    "status": "Status",
+    "fullyCompliant": "Fully Compliant",
+    "partiallyCompliant": "Partially Compliant",
+    "nonCompliant": "Non-Compliant",
+    "nonConformantCriteria": "Non-Conformant Criteria",
+    "criterion": "Criterion",
+    "thematic": "Thematic",
+    "derogation": "Derogation",
+    "justification": "Justification",
+    "derogationYes": "Yes (disproportionate burden)",
+    "derogationNo": "No",
+    "contactAndFeedback": "Contact & Feedback",
+    "contactIntro": "If you encounter accessibility barriers on this site, or need information in an alternative format, please contact us:",
+    "relatedDocuments": "Related Documents",
+    "multiannualScheme": "Multiannual Accessibility Scheme (3 years)",
+    "annualActionPlan": "Annual Accessibility Action Plan",
+    "technologiesUsed": "Technologies Used",
+    "testEnvironment": "Test Environment",
+    "testEnvironmentIntro": "This statement was established based on automated and manual testing using the following tools:"
   }
 }

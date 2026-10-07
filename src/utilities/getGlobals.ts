@@ -12,7 +12,7 @@ async function getGlobal<T extends Global>(slug: T, locale: Locale, depth = 0): 
 
   const global = await payload.findGlobal({
     slug,
-    locale: locale as 'en' | 'es' | 'fr' | 'all',
+    locale: locale as 'en' | 'de' | 'fr' | 'es' | 'all',
     fallbackLocale: 'en',
     depth,
   })

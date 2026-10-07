@@ -7,6 +7,7 @@ export const Header: GlobalConfig = {
   slug: 'header',
   label: {
     en: 'Header',
+    de: 'Kopfbereich',
     es: 'Cabecera',
     fr: 'En-tête',
   },
@@ -26,6 +27,7 @@ export const Header: GlobalConfig = {
       localized: true,
       label: {
         en: 'Navigation Items',
+        de: 'Navigationselemente',
         es: 'Elementos de navegación',
         fr: 'Éléments de navigation',
       },

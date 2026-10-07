@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { cn } from '@/utilities/ui'
 import type { Page, Post } from '@/payload-types'
 import { Locale } from '@/i18n/config'
+import { useTranslations } from 'next-intl'
 
 type CMSLinkType = {
   appearance?: 'inline' | 'default' | 'outline' | 'ghost' | 'destructive' | 'secondary'
@@ -34,6 +35,7 @@ export const AccessibleLink: React.FC<CMSLinkType> = (props) => {
     url,
   } = props
 
+  const t = useTranslations('a11y')
   const localePrefix = locale === 'en' ? '' : `/${locale}`
 
   const href =
@@ -54,7 +56,7 @@ export const AccessibleLink: React.FC<CMSLinkType> = (props) => {
         {label}
         {children}
         {newTab && (
-          <span className="sr-only"> (nouvelle fenêtre)</span>
+          <span className="sr-only"> {t('newWindow')}</span>
         )}
       </Link>
     )
@@ -85,7 +87,7 @@ export const AccessibleLink: React.FC<CMSLinkType> = (props) => {
     <Link className={cn('inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-[color,box-shadow]', variant, size, className)} href={href} {...newTabProps}>
       {label}
       {children}
-      {newTab && <span className="sr-only"> (nouvelle fenêtre)</span>}
+      {newTab && <span className="sr-only"> {t('newWindow')}</span>}
     </Link>
   )
 }

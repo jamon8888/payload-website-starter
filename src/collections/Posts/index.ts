@@ -34,11 +34,13 @@ export const Posts: CollectionConfig<'posts'> = {
   labels: {
     singular: {
       en: 'Post',
+      de: 'Beitrag',
       es: 'Artículo',
       fr: 'Article',
     },
     plural: {
       en: 'Posts',
+      de: 'Beiträge',
       es: 'Artículos',
       fr: 'Articles',
     },
@@ -87,6 +89,7 @@ export const Posts: CollectionConfig<'posts'> = {
       localized: true,
       label: {
         en: 'Title',
+        de: 'Titel',
         es: 'Título',
         fr: 'Titre',
       },
@@ -102,6 +105,7 @@ export const Posts: CollectionConfig<'posts'> = {
               relationTo: 'media',
               label: {
                 en: 'Hero Image',
+                de: 'Titelbild',
                 es: 'Imagen destacada',
                 fr: 'Image à la une',
               },
@@ -128,6 +132,7 @@ export const Posts: CollectionConfig<'posts'> = {
           ],
           label: {
             en: 'Content',
+            de: 'Inhalt',
             es: 'Contenido',
             fr: 'Contenu',
           },
@@ -152,6 +157,7 @@ export const Posts: CollectionConfig<'posts'> = {
               localized: true,
               label: {
                 en: 'Related Posts',
+                de: 'Verwandte Beiträge',
                 es: 'Artículos relacionados',
                 fr: 'Articles connexes',
               },
@@ -167,6 +173,7 @@ export const Posts: CollectionConfig<'posts'> = {
               localized: true,
               label: {
                 en: 'Categories',
+                de: 'Kategorien',
                 es: 'Categorías',
                 fr: 'Catégories',
               },
@@ -174,6 +181,7 @@ export const Posts: CollectionConfig<'posts'> = {
           ],
           label: {
             en: 'Meta',
+            de: 'Meta',
             es: 'Meta',
             fr: 'Méta',
           },
@@ -182,6 +190,7 @@ export const Posts: CollectionConfig<'posts'> = {
           name: 'meta',
           label: {
             en: 'SEO',
+            de: 'SEO',
             es: 'SEO',
             fr: 'SEO',
           },
@@ -213,6 +222,7 @@ export const Posts: CollectionConfig<'posts'> = {
           name: 'aeo',
           label: {
             en: 'AEO / GEO',
+            de: 'AEO / GEO',
             es: 'AEO / GEO',
             fr: 'AEO / GEO',
           },
@@ -241,6 +251,7 @@ export const Posts: CollectionConfig<'posts'> = {
       },
       label: {
         en: 'Published At',
+        de: 'Veröffentlicht am',
         es: 'Publicado el',
         fr: 'Publié le',
       },

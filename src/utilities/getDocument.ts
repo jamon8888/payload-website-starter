@@ -12,7 +12,7 @@ async function getDocument(collection: Collection, slug: string, locale: Locale,
 
   const page = await payload.find({
     collection,
-    locale: locale as 'en' | 'es' | 'fr' | 'all',
+    locale: locale as 'en' | 'de' | 'fr' | 'es' | 'all',
     fallbackLocale: 'en',
     depth,
     where: {

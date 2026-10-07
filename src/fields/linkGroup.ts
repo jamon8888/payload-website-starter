@@ -14,6 +14,8 @@ export const linkGroup: LinkGroupType = ({ appearances, overrides = {} } = {}) =
   const generatedLinkGroup: Field = {
     name: 'links',
     type: 'array',
+    // Localized so each link in a group can be translated per locale.
+    localized: true,
     fields: [
       link({
         appearances,

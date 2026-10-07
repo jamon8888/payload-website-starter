@@ -7,6 +7,9 @@ node_modules
 next-env.d.ts
 .vercel
 
+# TypeScript incremental build cache
+*.tsbuildinfo
+
 # Payload default media upload directory
 public/media/
 
@@ -22,3 +25,6 @@ node_modules/
 /playwright/.cache/
 .openbitfun/
 .env*
+
+# Lighthouse CI
+.lighthouseci/

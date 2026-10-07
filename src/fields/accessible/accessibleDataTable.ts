@@ -17,6 +17,7 @@ export const accessibleDataTable: Field = {
       required: true,
       label: {
         en: 'Caption (required, describes the table)',
+        de: 'Beschriftung (erforderlich, beschreibt die Tabelle)',
         fr: 'Légende (obligatoire, décrit le tableau)',
       },
     },
@@ -26,6 +27,7 @@ export const accessibleDataTable: Field = {
       required: true,
       label: {
         en: 'Header Row',
+        de: 'Kopfzeile',
         fr: 'Ligne d\'en-tête',
       },
       fields: [
@@ -35,6 +37,7 @@ export const accessibleDataTable: Field = {
           required: true,
           label: {
             en: 'Header Cell',
+            de: 'Kopfzelle',
             fr: 'Cellule d\'en-tête',
           },
         },
@@ -46,6 +49,7 @@ export const accessibleDataTable: Field = {
       required: true,
       label: {
         en: 'Data Rows',
+        de: 'Datenzeilen',
         fr: 'Lignes de données',
       },
       fields: [
@@ -58,6 +62,7 @@ export const accessibleDataTable: Field = {
               type: 'text',
               label: {
                 en: 'Cell',
+                de: 'Zelle',
                 fr: 'Cellule',
               },
             },

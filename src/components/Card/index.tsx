@@ -6,6 +6,7 @@ import React, { Fragment } from 'react'
 
 import type { Post } from '@/payload-types'
 import { Locale } from '@/i18n/config'
+import { useTranslations } from 'next-intl'
 
 import { Media } from '@/components/Media'
 
@@ -21,6 +22,7 @@ export const Card: React.FC<{
   locale?: Locale
 }> = (props) => {
   const { cardRef, linkRef } = useClickableCard({})
+  const tCommon = useTranslations('common')
   const { className, doc, relationTo, showCategories, title: titleFromProps, locale = 'en' } = props
 
   const { slug, categories, meta, title } = doc || {}
@@ -41,7 +43,7 @@ export const Card: React.FC<{
       ref={cardRef}
     >
       <div className="relative w-full ">
-        {!metaImage && <div className="">No image</div>}
+        {!metaImage && <div className="">{tCommon('noImage')}</div>}
         {metaImage && typeof metaImage !== 'string' && <Media resource={metaImage} size="33vw" />}
       </div>
       <div className="p-4">
@@ -51,7 +53,7 @@ export const Card: React.FC<{
               if (typeof category === 'object') {
                 const { title: titleFromCategory } = category
 
-                const categoryTitle = titleFromCategory || 'Untitled category'
+                const categoryTitle = titleFromCategory || tCommon('untitledCategory')
 
                 const isLast = index === categories.length - 1
 

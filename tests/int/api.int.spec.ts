@@ -17,4 +17,14 @@ describe('API', () => {
     })
     expect(users).toBeDefined()
   })
+
+  it('exposes a version for every document type', async () => {
+    const versions = await payload.findVersions({ collection: 'posts' })
+    expect(versions).toBeDefined()
+  })
+
+  it('registers the accessibility statement global', async () => {
+    const statement = await payload.findGlobal({ slug: 'accessibility-statement', depth: 0 })
+    expect(statement).toBeDefined()
+  })
 })

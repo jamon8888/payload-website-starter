@@ -16,6 +16,7 @@ export const accessibleEmbed: Field = {
       required: true,
       label: {
         en: 'Embed URL',
+        de: 'Einbettungs-URL',
         fr: 'URL d\'intégration',
       },
     },
@@ -25,11 +26,13 @@ export const accessibleEmbed: Field = {
       required: true,
       label: {
         en: 'Frame Title',
+        de: 'Frame-Titel',
         fr: 'Titre du cadre',
       },
       admin: {
         description: {
           en: 'Describes the function of the frame, e.g. "Map of Paris office location"',
+          de: 'Beschreibt die Funktion des Frames, z. B. "Karte des Standorts des Büros in Paris"',
           fr: 'Décrit la fonction du cadre, ex: "Carte de localisation du bureau de Paris"',
         },
       },

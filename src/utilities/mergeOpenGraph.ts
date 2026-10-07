@@ -1,16 +1,26 @@
 import type { Metadata } from 'next'
 import { getServerSideURL } from './getURL'
 
+/**
+ * Fallback site description. Also used as the `meta[name=description]` value by
+ * `generateMeta`, so every page ships a description even before an editor has
+ * filled one in — Lighthouse and most crawlers treat a missing one as a defect.
+ */
+export const defaultDescription = 'An open-source website built with Payload and Next.js.'
+
+/** Fallback site name, used for Open Graph and JSON-LD publisher. */
+export const defaultSiteName = 'Payload Website Template'
+
 const defaultOpenGraph: Metadata['openGraph'] = {
   type: 'website',
-  description: 'An open-source website built with Payload and Next.js.',
+  description: defaultDescription,
   images: [
     {
       url: `${getServerSideURL()}/website-template-OG.webp`,
     },
   ],
-  siteName: 'Payload Website Template',
-  title: 'Payload Website Template',
+  siteName: defaultSiteName,
+  title: defaultSiteName,
 }
 
 export const mergeOpenGraph = (og?: Metadata['openGraph']): Metadata['openGraph'] => {

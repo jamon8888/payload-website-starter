@@ -14,6 +14,7 @@
   },
   "search": {
     "title": "Recherche",
+    "label": "Rechercher",
     "placeholder": "Rechercher...",
     "noResults": "Aucun résultat trouvé.",
     "resultsFor": "Résultats pour"
@@ -24,7 +25,7 @@
     "goHome": "Retour à l'accueil"
   },
   "pageRange": {
-    "showing": "Affichage de {{start}} - {{end}} sur {{total}} {{type}}",
+    "showing": "Affichage de {start} - {end} sur {total} {type}",
     "noResults": "La recherche n'a produit aucun résultat."
   },
   "hero": {
@@ -33,7 +34,11 @@
   "pagination": {
     "previous": "Précédent",
     "next": "Suivant",
-    "page": "Page"
+    "page": "Page",
+    "ariaLabel": "pagination",
+    "goToPreviousPage": "Aller à la page précédente",
+    "goToNextPage": "Aller à la page suivante",
+    "morePages": "Autres pages"
   },
   "footer": {
     "rights": "Tous droits réservés."
@@ -41,5 +46,50 @@
   "languageSwitcher": {
     "label": "Langue",
     "ariaLabel": "Sélectionner la langue"
+  },
+  "common": {
+    "noImage": "Aucune image",
+    "untitledCategory": "Catégorie sans titre",
+    "selectTheme": "Sélectionner un thème",
+    "theme": "Thème",
+    "auto": "Auto",
+    "light": "Clair",
+    "dark": "Sombre"
+  },
+  "a11y": {
+    "skipToContent": "Aller au contenu principal",
+    "mainNavigation": "Navigation principale",
+    "footerNavigation": "Navigation du pied de page",
+    "newWindow": "(nouvelle fenêtre)",
+    "breadcrumb": "Fil d'Ariane",
+    "close": "Fermer"
+  },
+  "accessibility": {
+    "metaTitle": "Déclaration d'accessibilité",
+    "title": "Déclaration d'accessibilité",
+    "intro": "Cette déclaration d'accessibilité s'applique à ce site web.",
+    "complianceStatus": "État de conformité",
+    "referenceStandard": "Référentiel",
+    "auditDate": "Date d'audit",
+    "globalComplianceRate": "Taux de conformité global",
+    "status": "Statut",
+    "fullyCompliant": "Totalement conforme",
+    "partiallyCompliant": "Partiellement conforme",
+    "nonCompliant": "Non conforme",
+    "nonConformantCriteria": "Critères non conformes",
+    "criterion": "Critère",
+    "thematic": "Thématique",
+    "derogation": "Dérogation",
+    "justification": "Justification",
+    "derogationYes": "Oui (charge disproportionnée)",
+    "derogationNo": "Non",
+    "contactAndFeedback": "Contact et retours",
+    "contactIntro": "Si vous rencontrez des obstacles d'accessibilité sur ce site, ou avez besoin d'informations dans un format alternatif, veuillez nous contacter :",
+    "relatedDocuments": "Documents associés",
+    "multiannualScheme": "Schéma pluriannuel d'accessibilité (3 ans)",
+    "annualActionPlan": "Plan d'action annuel d'accessibilité",
+    "technologiesUsed": "Technologies utilisées",
+    "testEnvironment": "Environnement de test",
+    "testEnvironmentIntro": "Cette déclaration a été établie sur la base de tests automatisés et manuels utilisant les outils suivants :"
   }
 }

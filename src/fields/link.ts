@@ -2,26 +2,57 @@ import type { Field, GroupField } from 'payload'
 
 import deepMerge from '@/utilities/deepMerge'
 
+/**
+ * Link labels that carry no meaning outside their surrounding sentence.
+ * RGAA 6.1/6.2 requires links to be understandable in isolation, so these
+ * are rejected regardless of the admin UI language.
+ */
 const GENERIC_LINK_LABELS = [
+  // French
   'cliquez ici',
   'en savoir plus',
   'lire la suite',
   'ici',
+  // English
   'click here',
   'read more',
   'learn more',
   'here',
+  // German
+  'hier klicken',
+  'mehr erfahren',
+  'weiterlesen',
+  'hier',
+  // Spanish
+  'haz clic aquí',
+  'haga clic aquí',
+  'más información',
+  'leer más',
+  'aquí',
 ]
+
+const NON_EXPLICIT_LABEL_ERROR = {
+  en: 'Non-explicit link label out of context — RGAA 6.1/6.2',
+  de: 'Nicht aussagekräftige Linkbezeichnung ohne Kontext — RGAA 6.1/6.2',
+  es: 'Etiqueta de enlace no explícita fuera de contexto — RGAA 6.1/6.2',
+  fr: 'Intitulé de lien non explicite hors contexte — RGAA 6.1/6.2',
+}
 
 export type LinkAppearances = 'default' | 'outline'
 
-export const appearanceOptions: Record<LinkAppearances, { label: string; value: string }> = {
+export const appearanceOptions: Record<
+  LinkAppearances,
+  {
+    label: Record<string, string>
+    value: string
+  }
+> = {
   default: {
-    label: 'Default',
+    label: { en: 'Default', de: 'Standard', es: 'Predeterminado', fr: 'Défaut' },
     value: 'default',
   },
   outline: {
-    label: 'Outline',
+    label: { en: 'Outline', de: 'Umrandet', es: 'Contorno', fr: 'Contour' },
     value: 'outline',
   },
 }
@@ -41,13 +72,15 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
     },
     hooks: {
       beforeValidate: [
-        ({ data }) => {
+        ({ data, req }) => {
           const label = data?.label
-          if (label) {
+          if (typeof label === 'string' && label) {
             const normalized = label.trim().toLowerCase()
             if (GENERIC_LINK_LABELS.includes(normalized)) {
+              // Surface the message in the editor's own admin language.
+              const adminLocale = (req?.locale ?? 'en') as keyof typeof NON_EXPLICIT_LABEL_ERROR
               throw new Error(
-                'Intitulé de lien non explicite hors contexte — RGAA 6.1/6.2'
+                NON_EXPLICIT_LABEL_ERROR[adminLocale] ?? NON_EXPLICIT_LABEL_ERROR.en,
               )
             }
           }
@@ -71,6 +104,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
               {
                 label: {
                   en: 'Internal link',
+                  de: 'Interner Link',
                   es: 'Enlace interno',
                   fr: 'Lien interne',
                 },
@@ -79,6 +113,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
               {
                 label: {
                   en: 'Custom URL',
+                  de: 'Eigene URL',
                   es: 'URL personalizada',
                   fr: 'URL personnalisée',
                 },
@@ -97,6 +132,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
             },
             label: {
               en: 'Open in new tab',
+              de: 'In neuem Tab öffnen',
               es: 'Abrir en nueva pestaña',
               fr: 'Ouvrir dans un nouvel onglet',
             },
@@ -115,6 +151,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
       },
       label: {
         en: 'Document to link to',
+        de: 'Dokument, auf das verlinkt wird',
         es: 'Documento para enlazar',
         fr: 'Document à lier',
       },
@@ -129,6 +166,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
       },
       label: {
         en: 'Custom URL',
+        de: 'Eigene URL',
         es: 'URL personalizada',
         fr: 'URL personnalisée',
       },
@@ -152,11 +190,14 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
         {
           name: 'label',
           type: 'text',
+          // Localized so navigation and CTA labels can be translated per locale.
+          localized: true,
           admin: {
             width: '50%',
           },
           label: {
             en: 'Label',
+            de: 'Bezeichnung',
             es: 'Etiqueta',
             fr: 'Libellé',
           },
@@ -181,6 +222,7 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
       admin: {
         description: {
           en: 'Choose how the link should be rendered.',
+          de: 'Wählen Sie, wie der Link dargestellt werden soll.',
           es: 'Elige cómo se debe renderizar el enlace.',
           fr: 'Choisissez comment le lien doit être rendu.',
         },

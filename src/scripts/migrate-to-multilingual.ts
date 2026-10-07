@@ -1,304 +1,204 @@
 /**
- * Migration Script: Convert existing content to multilingual format
- * 
- * This script helps migrate existing single-language content to the new multilingual format.
- * It should be run after enabling localization in Payload config.
- * 
+ * Migration Script: backfill existing content into every enabled locale.
+ *
+ * Before Payload handled localization, content was stored as flat scalars /
+ * plain arrays. Once a field is marked `localized: true`, that data only lives
+ * in the default locale's rows and every other locale falls back to it.
+ *
+ * This script copies the existing default-locale value into every configured
+ * locale so editors start from a complete baseline instead of silent fallbacks.
+ * Translations still have to be done by a human — it just removes the gap.
+ *
  * Usage:
- * npx tsx src/scripts/migrate-to-multilingual.ts
+ *   pnpm migrate:multilingual            # apply
+ *   pnpm migrate:multilingual:dry        # report only
  */
 
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { locales, defaultLocale, Locale } from '@/i18n/config'
 
-interface MigrationOptions {
-  dryRun?: boolean
-  collections?: string[]
-  verbose?: boolean
+import { locales, defaultLocale } from '@/i18n/config'
+import type { Locale } from '@/i18n/config'
+
+const COLLECTIONS = ['pages', 'posts', 'categories', 'media'] as const
+const GLOBALS = ['header', 'footer'] as const
+
+type Options = {
+  dryRun: boolean
+  verbose: boolean
 }
 
-async function migrateToMultilingual(options: MigrationOptions = {}) {
-  const { dryRun = false, collections = ['pages', 'posts', 'categories', 'media'], verbose = true } = options
-  
+async function migrateToMultilingual({ dryRun, verbose }: Options) {
   const payload = await getPayload({ config })
-  
-  console.log('🚀 Starting multilingual migration...')
-  console.log(`📋 Options: dryRun=${dryRun}, collections=${collections.join(', ')}`)
-  
+
+  console.log('Starting multilingual backfill...')
+  console.log(`Locales: ${locales.join(', ')} (default: ${defaultLocale})`)
+
   if (dryRun) {
-    console.log('⚠️  DRY RUN MODE - No changes will be saved')
+    console.log('DRY RUN MODE — no changes will be saved')
   }
 
-  try {
-    // Migrate each collection
-    for (const collectionSlug of collections) {
-      console.log(`\n📦 Migrating collection: ${collectionSlug}`)
-      await migrateCollection(payload, collectionSlug, { dryRun, verbose })
-    }
+  for (const collection of COLLECTIONS) {
+    await migrateCollection(payload, collection, { dryRun, verbose })
+  }
 
-    // Migrate globals
-    console.log('\n🌐 Migrating globals...')
-    await migrateGlobals(payload, { dryRun, verbose })
+  for (const global of GLOBALS) {
+    await migrateGlobal(payload, global, { dryRun, verbose })
+  }
 
-    console.log('\n✅ Migration completed successfully!')
-    
-    if (dryRun) {
-      console.log('\n⚠️  This was a dry run. Run without --dry-run to apply changes.')
+  console.log(dryRun ? '\nDry run complete.' : '\nMigration completed.')
+}
+
+/**
+ * Writes the document once per locale, so Payload creates the row for each one.
+ * Passing a single update with a per-locale object map does not work: the local
+ * API expects flat data scoped to the given locale.
+ */
+async function writeAllLocales(
+  payload: any,
+  target: { collection?: string; global?: string },
+  id: string | number,
+  data: Record<string, unknown>,
+  { dryRun }: Options,
+) {
+  for (const locale of locales) {
+    if (dryRun) continue
+
+    if (target.collection) {
+      await payload.update({
+        collection: target.collection,
+        id,
+        data,
+        locale: locale as Locale,
+        fallbackLocale: false,
+      })
+    } else {
+      await payload.updateGlobal({
+        slug: target.global,
+        data,
+        locale: locale as Locale,
+        fallbackLocale: false,
+      })
     }
-    
-  } catch (error) {
-    console.error('\n❌ Migration failed:', error)
-    process.exit(1)
   }
 }
 
 async function migrateCollection(
   payload: any,
-  collectionSlug: string,
-  options: { dryRun: boolean; verbose: boolean }
-) {
+  collection: string,
+  options: Options,
+): Promise<void> {
   const { dryRun, verbose } = options
-  
-  // Get all documents
-  const docs = await payload.find({
-    collection: collectionSlug,
-    limit: 0,
+
+  // `locale: 'all'` is read-only: it returns one row per locale, which is how we
+  // can tell already-migrated documents from ones that only have the default.
+  const result = await payload.find({
+    collection,
+    locale: 'all' as const,
+    limit: 1000,
     pagination: false,
     depth: 0,
+    overrideAccess: true,
   })
 
-  console.log(`   Found ${docs.docs.length} documents`)
+  const alreadyLocalized = new Set<string>()
 
-  for (const doc of docs.docs) {
+  for (const row of result.docs) {
+    const base = row.localizedData
+      ? (row.localizedData as Record<string, unknown>)
+      : (row as Record<string, unknown>)
+
+    if (isLocalizedValue(base.title)) {
+      alreadyLocalized.add(String(row.id))
+    }
+  }
+
+  console.log(
+    `\n${collection}: ${result.totalDocs ?? result.docs.length} docs, ` +
+      `${alreadyLocalized.size} already localized`,
+  )
+
+  for (const row of result.docs) {
+    const doc = (row.localizedData ?? row) as Record<string, any>
+
+    if (alreadyLocalized.has(String(row.id))) {
+      if (verbose) console.log(`  skipping ${row.id} (already localized)`)
+      continue
+    }
+
+    // Write the same flat data into each locale.
+    const data = stripLocalizedWrappers(doc)
+
     if (verbose) {
-      console.log(`   📄 Processing: ${doc.title || doc.slug || doc.id}`)
+      console.log(`  ${dryRun ? 'would update' : 'updating'} ${row.id}`)
     }
 
-    // Check if already localized (has locale-specific fields)
-    const needsMigration = checkNeedsMigration(doc, collectionSlug)
-    
-    if (!needsMigration) {
-      if (verbose) console.log(`   ⏭️  Already localized, skipping`)
-      continue
-    }
-
-    // Create localized version
-    const localizedData = createLocalizedData(doc, collectionSlug)
-    
-    if (dryRun) {
-      console.log(`   🔍 Would update: ${doc.id}`)
-      if (verbose) console.log(`   📝 New data:`, JSON.stringify(localizedData, null, 2))
-    } else {
-      await payload.update({
-        collection: collectionSlug,
-        id: doc.id,
-        data: localizedData,
-        locale: defaultLocale,
-        fallbackLocale: defaultLocale,
-      })
-      console.log(`   ✅ Updated: ${doc.id}`)
-    }
+    await writeAllLocales(payload, { collection }, row.id as string, data, options)
   }
 }
 
-function checkNeedsMigration(doc: any, collectionSlug: string): boolean {
-  // Check if title is already an object (localized)
-  if (doc.title && typeof doc.title === 'object' && doc.title.en) {
-    return false // Already localized
-  }
-  
-  // Check for other localized fields
-  const localizedFields = getLocalizedFields(collectionSlug)
-  
-  for (const field of localizedFields) {
-    if (doc[field] && typeof doc[field] === 'object' && doc[field].en) {
-      return false
-    }
-  }
-  
-  return true // Needs migration
-}
-
-function getLocalizedFields(collectionSlug: string): string[] {
-  const fieldMap: Record<string, string[]> = {
-    pages: ['title', 'hero.richText', 'layout'],
-    posts: ['title', 'content', 'heroImage', 'relatedPosts', 'categories'],
-    categories: ['title'],
-    media: ['alt', 'caption'],
-  }
-  return fieldMap[collectionSlug] || []
-}
-
-function createLocalizedData(doc: any, collectionSlug: string): any {
-  const localizedFields = getLocalizedFields(collectionSlug)
-  const result: any = { ...doc }
-  
-  for (const field of localizedFields) {
-    if (doc[field] !== undefined && doc[field] !== null) {
-      // Convert string to localized object with default locale
-      if (typeof doc[field] === 'string' || typeof doc[field] === 'number') {
-        result[field] = {
-          en: doc[field],
-          es: doc[field], // Will need manual translation
-          fr: doc[field],
-        }
-      } else if (Array.isArray(doc[field])) {
-        // For arrays like layout blocks, wrap each item
-        result[field] = doc[field].map((item: any) => localizeBlock(item))
-      } else if (typeof doc[field] === 'object') {
-        // For nested objects like hero
-        result[field] = localizeObject(doc[field])
-      }
-    }
-  }
-  
-  return result
-}
-
-function localizeObject(obj: any): any {
-  if (!obj || typeof obj !== 'object') return obj
-  
-  const result: any = {}
-  
-  for (const [key, value] of Object.entries(obj)) {
-    if (typeof value === 'string' || typeof value === 'number') {
-      result[key] = {
-        en: value,
-        es: value,
-        fr: value,
-      }
-    } else if (Array.isArray(value)) {
-      result[key] = value.map(localizeObject)
-    } else if (typeof value === 'object' && value !== null) {
-      result[key] = localizeObject(value)
-    } else {
-      result[key] = value
-    }
-  }
-  
-  return result
-}
-
-function localizeBlock(block: any): any {
-  // Localize block fields that are known to be localized
-  const localizedBlock = { ...block }
-  
-  if (block.richText) {
-    localizedBlock.richText = localizeObject(block.richText)
-  }
-  
-  if (block.columns) {
-    localizedBlock.columns = block.columns.map((col: any) => ({
-      ...col,
-      richText: col.richText ? localizeObject(col.richText) : undefined,
-    }))
-  }
-  
-  if (block.content) {
-    localizedBlock.content = localizeObject(block.content)
-  }
-  
-  if (block.introContent) {
-    localizedBlock.introContent = localizeObject(block.introContent)
-  }
-  
-  if (block.links) {
-    localizedBlock.links = block.links.map((link: any) => ({
-      ...link,
-      link: {
-        ...link.link,
-        label: typeof link.link?.label === 'string' 
-          ? { en: link.link.label, es: link.link.label, fr: link.link.label }
-          : link.link.label,
-      },
-    }))
-  }
-  
-  return localizedBlock
-}
-
-async function migrateGlobals(
+async function migrateGlobal(
   payload: any,
-  options: { dryRun: boolean; verbose: boolean }
-) {
+  global: string,
+  options: Options,
+): Promise<void> {
   const { dryRun, verbose } = options
-  const globals = ['header', 'footer']
-  
-  for (const globalSlug of globals) {
-    if (verbose) console.log(`   🌐 Processing global: ${globalSlug}`)
-    
-    const global = await payload.findGlobal({ slug: globalSlug, depth: 0 })
-    
-    if (!global) {
-      console.log(`   ⏭️  Global not found: ${globalSlug}`)
-      continue
-    }
-    
-    const needsMigration = checkGlobalNeedsMigration(global)
-    
-    if (!needsMigration) {
-      if (verbose) console.log(`   ⏭️  Already localized, skipping`)
-      continue
-    }
-    
-    const localizedData = createLocalizedGlobalData(global)
-    
-    if (dryRun) {
-      console.log(`   🔍 Would update global: ${globalSlug}`)
-    } else {
-      await payload.updateGlobal({
-        slug: globalSlug,
-        data: localizedData,
-        locale: defaultLocale,
-        fallbackLocale: defaultLocale,
-      })
-      console.log(`   ✅ Updated global: ${globalSlug}`)
-    }
+
+  const found = await payload.findGlobal({
+    slug: global,
+    locale: 'all' as const,
+    depth: 0,
+    overrideAccess: true,
+  })
+
+  const doc = (found?.localizedData ?? found) as Record<string, any> | null
+
+  if (!doc) {
+    console.log(`\n${global}: not found, skipping`)
+    return
   }
-}
 
-function checkGlobalNeedsMigration(global: any): boolean {
-  if (global.navItems && Array.isArray(global.navItems)) {
-    for (const item of global.navItems) {
-      if (item.link?.label && typeof item.link.label === 'string') {
-        return true
-      }
-    }
+  if (isLocalizedValue(doc.navItems)) {
+    console.log(`\n${global}: already localized, skipping`)
+    return
   }
-  return false
-}
 
-function createLocalizedGlobalData(global: any): any {
-  const result = { ...global }
-  
-  if (global.navItems && Array.isArray(global.navItems)) {
-    result.navItems = global.navItems.map((item: any) => ({
-      ...item,
-      link: {
-        ...item.link,
-        label: item.link?.label 
-          ? { en: item.link.label, es: item.link.label, fr: item.link.label }
-          : item.link?.label,
-      },
-    }))
+  if (verbose) {
+    console.log(`  ${dryRun ? 'would update' : 'updating'} global ${global}`)
   }
-  
-  return result
+
+  await writeAllLocales(payload, { global }, global, stripLocalizedWrappers(doc), options)
 }
 
-// CLI entry point
-if (require.main === module) {
-  const args = process.argv.slice(2)
-  const dryRun = args.includes('--dry-run')
-  const verbose = args.includes('--verbose')
-  
-  migrateToMultilingual({ dryRun, verbose })
-    .then(() => process.exit(0))
-    .catch((error) => {
-      console.error('Migration failed:', error)
-      process.exit(1)
-    })
+/** `locale: 'all'` may hand back either a flat doc or one keyed by locale. */
+function isLocalizedValue(value: unknown): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+
+  const keys = Object.keys(value as Record<string, unknown>)
+
+  return keys.length > 0 && keys.every((key) => locales.includes(key as Locale))
 }
 
-export { migrateToMultilingual }
+/** Removes `localizedData` / `locale` bookkeeping Payload adds to `all` reads. */
+function stripLocalizedWrappers(doc: Record<string, any>): Record<string, unknown> {
+  const {
+    localizedData: _localizedData,
+    locale: _locale,
+    ...rest
+  } = doc
+
+  return rest
+}
+
+const args = process.argv.slice(2)
+const options: Options = {
+  dryRun: args.includes('--dry-run'),
+  verbose: args.includes('--verbose'),
+}
+
+migrateToMultilingual(options)
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error('Migration failed:', error)
+    process.exit(1)
+  })

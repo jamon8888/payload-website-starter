@@ -35,6 +35,7 @@ export const accessibleImage: Field = {
         condition: (_, siblingData: { role?: string }) => siblingData?.role === 'informative',
         description: {
           en: 'Required for informative images. Leave empty for decorative images.',
+          de: 'Erforderlich für informative Bilder. Für dekorative Bilder leer lassen.',
           fr: 'Requis pour les images informatives. Laisser vide pour les images décoratives.',
         },
       },

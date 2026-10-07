@@ -14,6 +14,7 @@
   },
   "search": {
     "title": "Suchen",
+    "label": "Suchen",
     "placeholder": "Suchen...",
     "noResults": "Keine Ergebnisse gefunden.",
     "resultsFor": "Ergebnisse für"
@@ -24,7 +25,7 @@
     "goHome": "Zur Startseite"
   },
   "pageRange": {
-    "showing": "Zeige {{start}} - {{end}} von {{total}} {{type}}",
+    "showing": "Zeige {start} - {end} von {total} {type}",
     "noResults": "Die Suche ergab keine Ergebnisse."
   },
   "hero": {
@@ -33,7 +34,11 @@
   "pagination": {
     "previous": "Zurück",
     "next": "Weiter",
-    "page": "Seite"
+    "page": "Seite",
+    "ariaLabel": "Seitennummerierung",
+    "goToPreviousPage": "Zur vorherigen Seite",
+    "goToNextPage": "Zur nächsten Seite",
+    "morePages": "Weitere Seiten"
   },
   "footer": {
     "rights": "Alle Rechte vorbehalten."
@@ -41,5 +46,50 @@
   "languageSwitcher": {
     "label": "Sprache",
     "ariaLabel": "Sprache auswählen"
+  },
+  "common": {
+    "noImage": "Kein Bild",
+    "untitledCategory": "Kategorie ohne Titel",
+    "selectTheme": "Design auswählen",
+    "theme": "Design",
+    "auto": "Automatisch",
+    "light": "Hell",
+    "dark": "Dunkel"
+  },
+  "a11y": {
+    "skipToContent": "Zum Hauptinhalt springen",
+    "mainNavigation": "Hauptnavigation",
+    "footerNavigation": "Fußzeilennavigation",
+    "newWindow": "(neues Fenster)",
+    "breadcrumb": "Brotkrumennavigation",
+    "close": "Schließen"
+  },
+  "accessibility": {
+    "metaTitle": "Erklärung zur Barrierefreiheit",
+    "title": "Erklärung zur Barrierefreiheit",
+    "intro": "Diese Erklärung zur Barrierefreiheit gilt für diese Website.",
+    "complianceStatus": "Stand der Barrierefreiheit",
+    "referenceStandard": "Referenzstandard",
+    "auditDate": "Datum der Prüfung",
+    "globalComplianceRate": "Gesamterfüllungsgrad",
+    "status": "Status",
+    "fullyCompliant": "Vollständig konform",
+    "partiallyCompliant": "Teilweise konform",
+    "nonCompliant": "Nicht konform",
+    "nonConformantCriteria": "Nicht konforme Kriterien",
+    "criterion": "Kriterium",
+    "thematic": "Thematik",
+    "derogation": "Ausnahme",
+    "justification": "Begründung",
+    "derogationYes": "Ja (unverhältnismäßige Belastung)",
+    "derogationNo": "Nein",
+    "contactAndFeedback": "Kontakt und Rückmeldungen",
+    "contactIntro": "Wenn Ihnen auf dieser Website Barrieren begegnen oder Sie Informationen in einem alternativen Format benötigen, kontaktieren Sie uns bitte:",
+    "relatedDocuments": "Zugehörige Dokumente",
+    "multiannualScheme": "Mehrjähriger Plan zur Barrierefreiheit (3 Jahre)",
+    "annualActionPlan": "Jährlicher Maßnahmenplan zur Barrierefreiheit",
+    "technologiesUsed": "Eingesetzte Technologien",
+    "testEnvironment": "Testumgebung",
+    "testEnvironmentIntro": "Diese Erklärung beruht auf automatisierten und manuellen Tests mit den folgenden Werkzeugen:"
   }
 }

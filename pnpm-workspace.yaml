@@ -1,9 +1,11 @@
+packages:
+  - '.'
 allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true
   bufferutil: false
-  chromedriver: set this to true or false
-  core-js: set this to true or false
+  chromedriver: false
+  core-js: false
   esbuild: true
-  puppeteer: set this to true or false
+  puppeteer: false
   unrs-resolver: true

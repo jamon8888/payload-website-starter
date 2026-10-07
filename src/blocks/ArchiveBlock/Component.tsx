@@ -30,7 +30,7 @@ export const ArchiveBlock: React.FC<
 
     const fetchedPosts = await payload.find({
       collection: 'posts',
-      locale: locale as 'en' | 'es' | 'fr' | 'all',
+      locale: locale as 'en' | 'de' | 'fr' | 'es' | 'all',
       fallbackLocale: 'en',
       depth: 1,
       limit,

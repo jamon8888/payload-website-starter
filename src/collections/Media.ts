@@ -19,11 +19,13 @@ export const Media: CollectionConfig = {
   labels: {
     singular: {
       en: 'Media',
+      de: 'Medien',
       es: 'Medio',
       fr: 'Média',
     },
     plural: {
       en: 'Media',
+      de: 'Medien',
       es: 'Medios',
       fr: 'Médias',
     },
@@ -47,12 +49,14 @@ export const Media: CollectionConfig = {
       ],
       label: {
         en: 'Image Role',
+        de: 'Bildrolle',
         es: 'Rol de la imagen',
         fr: 'Rôle de l\'image',
       },
       admin: {
         description: {
           en: 'Informative images require alt text. Decorative images are ignored by screen readers.',
+          de: 'Informative Bilder benötigen Alternativtexte. Dekorative Bilder werden von Screenreadern ignoriert.',
           fr: 'Les images informatives nécessitent un texte alternatif. Les images décoratives sont ignorées par les lecteurs d\'écran.',
         },
       },
@@ -65,6 +69,7 @@ export const Media: CollectionConfig = {
         condition: (_, siblingData) => siblingData?.role === 'informative',
         description: {
           en: 'Required for informative images. Leave empty for decorative images.',
+          de: 'Erforderlich für informative Bilder. Für dekorative Bilder leer lassen.',
           fr: 'Requis pour les images informatives. Laisser vide pour les images décoratives.',
         },
       },
@@ -80,6 +85,7 @@ export const Media: CollectionConfig = {
       },
       label: {
         en: 'Alt Text',
+        de: 'Alternativtext',
         es: 'Texto alternativo',
         fr: 'Texte alternatif',
       },
@@ -95,6 +101,7 @@ export const Media: CollectionConfig = {
       localized: true,
       label: {
         en: 'Caption',
+        de: 'Bildunterschrift',
         es: 'Pie de foto',
         fr: 'Légende',
       },

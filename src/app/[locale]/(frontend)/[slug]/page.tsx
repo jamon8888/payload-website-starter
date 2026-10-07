@@ -13,6 +13,9 @@ import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Locale, locales } from '@/i18n/config'
+import { AEOSection } from '@/blocks/AEO'
+import { BreadcrumbMarkup } from '@/components/schema'
+import { getServerSideURL } from '@/utilities/getURL'
 
 export async function generateStaticParams() {
   // During build, PAYLOAD_SECRET may not be available
@@ -75,8 +78,18 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   const { hero, layout } = page
 
+  const serverUrl = getServerSideURL()
+  const localePrefix = locale === 'en' ? '' : `/${locale}`
+  const canonicalUrl = `${serverUrl}${localePrefix}/${decodedSlug === 'home' ? '' : decodedSlug}`
+
   return (
     <article className="pt-16 pb-24">
+      {decodedSlug !== 'home' && (
+        <BreadcrumbMarkup
+          items={[{ name: page.title || decodedSlug, item: canonicalUrl }]}
+        />
+      )}
+
       <PageClient />
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects locale={locale} disableNotFound url={url} />
@@ -85,6 +98,8 @@ export default async function Page({ params: paramsPromise }: Args) {
 
       <RenderHero {...hero} />
       <RenderBlocks blocks={layout} />
+
+      <AEOSection aeo={page.aeo} />
     </article>
   )
 }
@@ -108,7 +123,7 @@ const queryPageBySlug = cache(async ({ slug, locale }: { slug: string; locale: s
 
   const result = await payload.find({
     collection: 'pages',
-    locale: locale as 'en' | 'es' | 'fr' | 'all',
+    locale: locale as 'en' | 'de' | 'fr' | 'es' | 'all',
     fallbackLocale: 'en',
     draft,
     limit: 1,

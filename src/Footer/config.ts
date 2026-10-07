@@ -7,6 +7,7 @@ export const Footer: GlobalConfig = {
   slug: 'footer',
   label: {
     en: 'Footer',
+    de: 'Fußbereich',
     es: 'Pie de página',
     fr: 'Pied de page',
   },
@@ -26,6 +27,7 @@ export const Footer: GlobalConfig = {
       localized: true,
       label: {
         en: 'Navigation Items',
+        de: 'Navigationselemente',
         es: 'Elementos de navegación',
         fr: 'Éléments de navigation',
       },

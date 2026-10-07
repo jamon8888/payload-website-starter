@@ -19,6 +19,7 @@ export const hero: Field = {
       defaultValue: 'lowImpact',
       label: {
         en: 'Type',
+        de: 'Typ',
         es: 'Tipo',
         fr: 'Type',
       },
@@ -26,6 +27,7 @@ export const hero: Field = {
         {
           label: {
             en: 'None',
+            de: 'Keine',
             es: 'Ninguno',
             fr: 'Aucun',
           },
@@ -34,6 +36,7 @@ export const hero: Field = {
         {
           label: {
             en: 'High Impact',
+            de: 'Hohe Auswirkung',
             es: 'Alto Impacto',
             fr: 'Fort Impact',
           },
@@ -42,6 +45,7 @@ export const hero: Field = {
         {
           label: {
             en: 'Medium Impact',
+            de: 'Mittlere Auswirkung',
             es: 'Impacto Medio',
             fr: 'Impact Moyen',
           },
@@ -50,6 +54,7 @@ export const hero: Field = {
         {
           label: {
             en: 'Low Impact',
+            de: 'Geringe Auswirkung',
             es: 'Bajo Impacto',
             fr: 'Faible Impact',
           },
@@ -90,6 +95,7 @@ export const hero: Field = {
       required: true,
       label: {
         en: 'Media',
+        de: 'Medien',
         es: 'Medio',
         fr: 'Média',
       },

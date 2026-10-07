@@ -10,6 +10,7 @@ import PageClient from './page.client'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '@/i18n/dictionary'
 import { Locale, locales } from '@/i18n/config'
+import { getServerSideURL } from '@/utilities/getURL'
 
 interface Args {
   params: Promise<{
@@ -58,7 +59,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   const posts = await payload.find({
     collection: 'posts',
-    locale: locale as 'en' | 'es' | 'fr' | 'all',
+    locale: locale as 'en' | 'de' | 'fr' | 'es' | 'all',
     fallbackLocale: 'en',
     depth: 1,
     limit: 12,
@@ -81,6 +82,7 @@ export default async function Page({ params: paramsPromise }: Args) {
           currentPage={posts.page}
           limit={12}
           totalDocs={posts.totalDocs}
+          locale={locale}
         />
       </div>
 
@@ -96,8 +98,14 @@ export default async function Page({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { pageNumber } = await paramsPromise
+  const { locale, pageNumber } = await paramsPromise
+  const dict = await getDictionary(locale)
+  const localePrefix = locale === 'en' ? '' : `/${locale}`
+
   return {
-    title: `Payload Website Template Posts Page ${pageNumber || ''}`,
+    title: `${dict.posts.title} — ${dict.pagination.page} ${pageNumber || ''}`.trim(),
+    alternates: {
+      canonical: `${getServerSideURL()}${localePrefix}/posts/page/${pageNumber}`,
+    },
   }
 }

@@ -4,6 +4,7 @@ export const AccessibilityStatement: GlobalConfig = {
   slug: 'accessibility-statement',
   label: {
     en: 'Accessibility Statement',
+    de: 'Erklärung zur Barrierefreiheit',
     es: 'Declaración de accesibilidad',
     fr: 'Déclaration d\'accessibilité',
   },
@@ -17,6 +18,7 @@ export const AccessibilityStatement: GlobalConfig = {
       required: true,
       label: {
         en: 'Audit Date',
+        de: 'Datum der Prüfung',
         es: 'Fecha de auditoría',
         fr: 'Date d\'audit',
       },
@@ -28,6 +30,7 @@ export const AccessibilityStatement: GlobalConfig = {
       required: true,
       label: {
         en: 'Reference Version',
+        de: 'Version des Referenzstandards',
         es: 'Versión de referencia',
         fr: 'Version du référentiel',
       },
@@ -40,6 +43,7 @@ export const AccessibilityStatement: GlobalConfig = {
       required: true,
       label: {
         en: 'Global Compliance Rate (%)',
+        de: 'Gesamterfüllungsgrad (%)',
         es: 'Tasa de cumplimiento global (%)',
         fr: 'Taux de conformité global (%)',
       },
@@ -49,6 +53,7 @@ export const AccessibilityStatement: GlobalConfig = {
       type: 'array',
       label: {
         en: 'Non-Conformant Criteria',
+        de: 'Nicht konforme Kriterien',
         es: 'Criterios no conformes',
         fr: 'Critères non conformes',
       },
@@ -59,6 +64,7 @@ export const AccessibilityStatement: GlobalConfig = {
           required: true,
           label: {
             en: 'Criterion (e.g., 10.1)',
+            de: 'Kriterium (z. B. 10.1)',
             es: 'Criterio (ej. 10.1)',
             fr: 'Critère (ex: 10.1)',
           },
@@ -69,6 +75,7 @@ export const AccessibilityStatement: GlobalConfig = {
           required: true,
           label: {
             en: 'Thematic (e.g., Images, Colors)',
+            de: 'Thematik (z. B. Bilder, Farben)',
             es: 'Temática (ej. Imágenes, Colores)',
             fr: 'Thématique (ex: Images, Couleurs)',
           },
@@ -78,6 +85,7 @@ export const AccessibilityStatement: GlobalConfig = {
           type: 'checkbox',
           label: {
             en: 'Derogation for disproportionate burden',
+            de: 'Ausnahme wegen unverhältnismäßiger Belastung',
             es: 'Exención por carga desproporcionada',
             fr: 'Dérogation pour charge disproportionnée',
           },
@@ -88,6 +96,7 @@ export const AccessibilityStatement: GlobalConfig = {
           localized: true,
           label: {
             en: 'Justification',
+            de: 'Begründung',
             es: 'Justificación',
             fr: 'Justification',
           },
@@ -100,6 +109,7 @@ export const AccessibilityStatement: GlobalConfig = {
       required: true,
       label: {
         en: 'Contact Email',
+        de: 'Kontakt-E-Mail',
         es: 'Email de contacto',
         fr: 'Email de contact',
       },
@@ -109,6 +119,7 @@ export const AccessibilityStatement: GlobalConfig = {
       type: 'text',
       label: {
         en: 'Multiannual Scheme URL (3 years)',
+        de: 'URL des mehrjährigen Plans (3 Jahre)',
         es: 'URL del plan plurianual (3 años)',
         fr: 'Lien vers le schéma pluriannuel (3 ans)',
       },
@@ -118,6 +129,7 @@ export const AccessibilityStatement: GlobalConfig = {
       type: 'text',
       label: {
         en: 'Annual Action Plan URL',
+        de: 'URL des jährlichen Maßnahmenplans',
         es: 'URL del plan de acción anual',
         fr: 'Lien vers le plan d\'action annuel',
       },

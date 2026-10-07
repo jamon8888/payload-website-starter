@@ -28,11 +28,13 @@ export const Pages: CollectionConfig<'pages'> = {
   labels: {
     singular: {
       en: 'Page',
+      de: 'Seite',
       es: 'Página',
       fr: 'Page',
     },
     plural: {
       en: 'Pages',
+      de: 'Seiten',
       es: 'Páginas',
       fr: 'Pages',
     },
@@ -76,6 +78,7 @@ export const Pages: CollectionConfig<'pages'> = {
       localized: true,
       label: {
         en: 'Title',
+        de: 'Titel',
         es: 'Título',
         fr: 'Titre',
       },
@@ -87,6 +90,7 @@ export const Pages: CollectionConfig<'pages'> = {
           fields: [hero],
           label: {
             en: 'Hero',
+            de: 'Hero-Bereich',
             es: 'Hero',
             fr: 'Héro',
           },
@@ -106,6 +110,7 @@ export const Pages: CollectionConfig<'pages'> = {
           ],
           label: {
             en: 'Content',
+            de: 'Inhalt',
             es: 'Contenido',
             fr: 'Contenu',
           },
@@ -114,6 +119,7 @@ export const Pages: CollectionConfig<'pages'> = {
           name: 'meta',
           label: {
             en: 'SEO',
+            de: 'SEO',
             es: 'SEO',
             fr: 'SEO',
           },
@@ -145,6 +151,7 @@ export const Pages: CollectionConfig<'pages'> = {
           name: 'aeo',
           label: {
             en: 'AEO / GEO',
+            de: 'AEO / GEO',
             es: 'AEO / GEO',
             fr: 'AEO / GEO',
           },
@@ -160,6 +167,7 @@ export const Pages: CollectionConfig<'pages'> = {
       },
       label: {
         en: 'Published At',
+        de: 'Veröffentlicht am',
         es: 'Publicado el',
         fr: 'Publié le',
       },

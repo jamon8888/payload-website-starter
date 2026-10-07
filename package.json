@@ -23,11 +23,12 @@
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
-    "a11y:axe": "axe http://localhost:3000 --tags wcag2a,wcag2aa,wcag22aa --exit",
-    "a11y:pa11y": "for locale in fr en de es; do pa11y http://localhost:3000/$locale --standard WCAG2AA --level error; done",
+    "a11y:axe": "for locale in / /fr /de /es; do echo \"::group::$locale\"; axe http://localhost:3000$locale --tags wcag2a,wcag2aa,wcag22aa --exit; done",
+    "a11y:pa11y": "for locale in / /fr /de /es; do echo \"::group::$locale\"; pa11y http://localhost:3000$locale --standard WCAG2AA --level error; done",
     "lighthouse:ci": "lhci autorun",
-    "schema:validate": "structured-data-testing-tool http://localhost:3000/fr --schemas Article,FAQPage,BreadcrumbList,WebPage",
-    "llms:check": "curl -sf http://localhost:3000/llms.txt > /dev/null",
+    "schema:validate": "sdtt --url http://127.0.0.1:3000/fr/posts/digital-horizons --presets Article && node scripts/check-jsonld.mjs",
+    "seed:local": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/seed-local.ts",
+    "llms:check": "curl -sf http://localhost:3000/llms.txt | grep -q '## Main Content'",
     "quality:all": "pnpm a11y:axe && pnpm a11y:pa11y && pnpm lighthouse:ci && pnpm schema:validate && pnpm llms:check"
   },
   "dependencies": {

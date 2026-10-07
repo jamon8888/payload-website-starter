@@ -9,11 +9,13 @@ export const Categories: CollectionConfig = {
   labels: {
     singular: {
       en: 'Category',
+      de: 'Kategorie',
       es: 'Categoría',
       fr: 'Catégorie',
     },
     plural: {
       en: 'Categories',
+      de: 'Kategorien',
       es: 'Categorías',
       fr: 'Catégories',
     },
@@ -35,6 +37,7 @@ export const Categories: CollectionConfig = {
       localized: true,
       label: {
         en: 'Title',
+        de: 'Titel',
         es: 'Título',
         fr: 'Titre',
       },

@@ -1,4 +1,6 @@
 import React from 'react'
+import { getTranslations } from 'next-intl/server'
+import type { Locale } from '@/i18n/config'
 
 interface PageRangeProps {
   className?: string
@@ -6,16 +8,21 @@ interface PageRangeProps {
   currentPage?: number
   limit?: number
   totalDocs?: number
+  locale: Locale
 }
 
-export const PageRange: React.FC<PageRangeProps> = (props) => {
+export const PageRange: React.FC<PageRangeProps> = async (props) => {
   const {
     className,
-    collection,
+    collection = 'posts',
     currentPage,
     limit,
     totalDocs,
+    locale,
   } = props
+
+  const t = await getTranslations({ locale, namespace: 'pageRange' })
+  const tCollection = await getTranslations({ locale, namespace: 'posts' })
 
   let indexStart = (currentPage ? currentPage - 1 : 1) * (limit || 1) + 1
   if (totalDocs && indexStart > totalDocs) indexStart = 0
@@ -23,18 +30,17 @@ export const PageRange: React.FC<PageRangeProps> = (props) => {
   let indexEnd = (currentPage || 1) * (limit || 1)
   if (totalDocs && indexEnd > totalDocs) indexEnd = totalDocs
 
-  const labels = collection === 'posts'
-    ? { plural: 'Posts', singular: 'Post' }
-    : { plural: 'Docs', singular: 'Doc' }
-
   return (
     <div className={[className, 'font-semibold'].filter(Boolean).join(' ')}>
-      {(typeof totalDocs === 'undefined' || totalDocs === 0) && `Search produced no results.`}
+      {(typeof totalDocs === 'undefined' || totalDocs === 0) && t('noResults')}
       {typeof totalDocs !== 'undefined' &&
         totalDocs > 0 &&
-        `Showing ${indexStart}${indexStart > 0 ? ` - ${indexEnd}` : ''} of ${totalDocs} ${
-          totalDocs > 1 ? labels.plural : labels.singular
-        }`}
+        t('showing', {
+          start: indexStart,
+          end: indexEnd,
+          total: totalDocs,
+          type: collection === 'posts' ? tCollection('title') : '',
+        })}
     </div>
   )
 }

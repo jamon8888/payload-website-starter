@@ -19,6 +19,7 @@ export const accessibleVideo: Field = {
       required: true,
       label: {
         en: 'Video File',
+        de: 'Videodatei',
         fr: 'Fichier vidéo',
       },
     },
@@ -29,11 +30,13 @@ export const accessibleVideo: Field = {
       required: true,
       label: {
         en: 'Captions (.vtt)',
+        de: 'Untertitel (.vtt)',
         fr: 'Sous-titres (.vtt)',
       },
       admin: {
         description: {
           en: 'WebVTT caption file required for accessibility compliance',
+          de: 'WebVTT-Untertiteldatei ist für die Barrierefreiheitskonformität erforderlich',
           fr: 'Fichier de sous-titres WebVTT requis pour la conformité accessibilité',
         },
       },
@@ -45,6 +48,7 @@ export const accessibleVideo: Field = {
       required: true,
       label: {
         en: 'Text Transcript',
+        de: 'Texttranskript',
         fr: 'Transcription textuelle',
       },
     },
@@ -54,11 +58,13 @@ export const accessibleVideo: Field = {
       relationTo: 'media',
       label: {
         en: 'Audio Description Track',
+        de: 'Audiodeskriptionsspur',
         fr: 'Piste d\'audiodescription',
       },
       admin: {
         description: {
           en: 'Required if video conveys visual information not in the main audio',
+          de: 'Erforderlich, wenn das Video visuelle Informationen vermittelt, die im Hauptton nicht enthalten sind',
           fr: 'Requis si la vidéo transmet des informations visuelles absentes de l\'audio principal',
         },
       },

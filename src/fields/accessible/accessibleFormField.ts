@@ -19,6 +19,7 @@ export const accessibleFormField: Field = {
       required: true,
       label: {
         en: 'Label',
+        de: 'Bezeichnung',
         fr: 'Libellé',
       },
     },
@@ -28,6 +29,7 @@ export const accessibleFormField: Field = {
       required: true,
       label: {
         en: 'Field Name (HTML name attribute)',
+        de: 'Feldname (HTML-Attribut name)',
         fr: 'Nom du champ (attribut HTML name)',
       },
     },
@@ -37,6 +39,7 @@ export const accessibleFormField: Field = {
       defaultValue: false,
       label: {
         en: 'Required Field',
+        de: 'Pflichtfeld',
         fr: 'Champ requis',
       },
     },
@@ -45,6 +48,7 @@ export const accessibleFormField: Field = {
       type: 'text',
       label: {
         en: 'Help Text (displayed below field)',
+        de: 'Hilfetext (wird unter dem Feld angezeigt)',
         fr: 'Texte d\'aide (affiché sous le champ)',
       },
     },
@@ -53,6 +57,7 @@ export const accessibleFormField: Field = {
       type: 'text',
       label: {
         en: 'Error Message (for validation)',
+        de: 'Fehlermeldung (für die Validierung)',
         fr: 'Message d\'erreur (pour la validation)',
       },
     },
