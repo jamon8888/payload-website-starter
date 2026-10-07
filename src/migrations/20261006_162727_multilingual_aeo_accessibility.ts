@@ -281,27 +281,27 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   DROP INDEX "header_rels_posts_id_idx";
   DROP INDEX "footer_rels_pages_id_idx";
   DROP INDEX "footer_rels_posts_id_idx";
-  ALTER TABLE "pages_blocks_cta_links" ADD COLUMN "_locale" "_locales" NOT NULL;
-  ALTER TABLE "pages_blocks_cta" ADD COLUMN "_locale" "_locales" NOT NULL;
-  ALTER TABLE "pages_blocks_content_columns" ADD COLUMN "_locale" "_locales" NOT NULL;
-  ALTER TABLE "pages_blocks_content" ADD COLUMN "_locale" "_locales" NOT NULL;
-  ALTER TABLE "pages_blocks_media_block" ADD COLUMN "_locale" "_locales" NOT NULL;
+  ALTER TABLE "pages_blocks_cta_links" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
+  ALTER TABLE "pages_blocks_cta" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
+  ALTER TABLE "pages_blocks_content_columns" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
+  ALTER TABLE "pages_blocks_content" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
+  ALTER TABLE "pages_blocks_media_block" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "pages_blocks_media_block" ADD COLUMN "image_asset_id" integer;
   ALTER TABLE "pages_blocks_media_block" ADD COLUMN "image_role" "enum_pages_blocks_media_block_image_role" DEFAULT 'informative';
   ALTER TABLE "pages_blocks_media_block" ADD COLUMN "image_alt" varchar;
-  ALTER TABLE "pages_blocks_archive" ADD COLUMN "_locale" "_locales" NOT NULL;
-  ALTER TABLE "pages_blocks_form_block" ADD COLUMN "_locale" "_locales" NOT NULL;
+  ALTER TABLE "pages_blocks_archive" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
+  ALTER TABLE "pages_blocks_form_block" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "pages_rels" ADD COLUMN "locale" "_locales";
-  ALTER TABLE "_pages_v_blocks_cta_links" ADD COLUMN "_locale" "_locales" NOT NULL;
-  ALTER TABLE "_pages_v_blocks_cta" ADD COLUMN "_locale" "_locales" NOT NULL;
-  ALTER TABLE "_pages_v_blocks_content_columns" ADD COLUMN "_locale" "_locales" NOT NULL;
-  ALTER TABLE "_pages_v_blocks_content" ADD COLUMN "_locale" "_locales" NOT NULL;
-  ALTER TABLE "_pages_v_blocks_media_block" ADD COLUMN "_locale" "_locales" NOT NULL;
+  ALTER TABLE "_pages_v_blocks_cta_links" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
+  ALTER TABLE "_pages_v_blocks_cta" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
+  ALTER TABLE "_pages_v_blocks_content_columns" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
+  ALTER TABLE "_pages_v_blocks_content" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
+  ALTER TABLE "_pages_v_blocks_media_block" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "_pages_v_blocks_media_block" ADD COLUMN "image_asset_id" integer;
   ALTER TABLE "_pages_v_blocks_media_block" ADD COLUMN "image_role" "enum__pages_v_blocks_media_block_image_role" DEFAULT 'informative';
   ALTER TABLE "_pages_v_blocks_media_block" ADD COLUMN "image_alt" varchar;
-  ALTER TABLE "_pages_v_blocks_archive" ADD COLUMN "_locale" "_locales" NOT NULL;
-  ALTER TABLE "_pages_v_blocks_form_block" ADD COLUMN "_locale" "_locales" NOT NULL;
+  ALTER TABLE "_pages_v_blocks_archive" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
+  ALTER TABLE "_pages_v_blocks_form_block" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "_pages_v" ADD COLUMN "snapshot" boolean;
   ALTER TABLE "_pages_v" ADD COLUMN "published_locale" "enum__pages_v_published_locale";
   ALTER TABLE "_pages_v_rels" ADD COLUMN "locale" "_locales";
@@ -310,10 +310,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "_posts_v" ADD COLUMN "published_locale" "enum__posts_v_published_locale";
   ALTER TABLE "_posts_v_rels" ADD COLUMN "locale" "_locales";
   ALTER TABLE "media" ADD COLUMN "role" "enum_media_role" DEFAULT 'informative' NOT NULL;
-  ALTER TABLE "categories_breadcrumbs" ADD COLUMN "_locale" "_locales" NOT NULL;
-  ALTER TABLE "header_nav_items" ADD COLUMN "_locale" "_locales" NOT NULL;
+  ALTER TABLE "categories_breadcrumbs" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
+  ALTER TABLE "header_nav_items" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "header_rels" ADD COLUMN "locale" "_locales";
-  ALTER TABLE "footer_nav_items" ADD COLUMN "_locale" "_locales" NOT NULL;
+  ALTER TABLE "footer_nav_items" ADD COLUMN "_locale" "_locales" NOT NULL DEFAULT 'en';
   ALTER TABLE "footer_rels" ADD COLUMN "locale" "_locales";
   ALTER TABLE "pages_aeo_answer_blocks" ADD CONSTRAINT "pages_aeo_answer_blocks_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."pages"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "pages_locales" ADD CONSTRAINT "pages_locales_meta_image_id_media_id_fk" FOREIGN KEY ("meta_image_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
@@ -433,6 +433,47 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "header_rels_posts_id_idx" ON "header_rels" USING btree ("posts_id","locale");
   CREATE INDEX "footer_rels_pages_id_idx" ON "footer_rels" USING btree ("pages_id","locale");
   CREATE INDEX "footer_rels_posts_id_idx" ON "footer_rels" USING btree ("posts_id","locale");
+  -- Backfill pre-localization rows into the new _locales tables (mapped to the
+  -- default locale) BEFORE their source columns are dropped below. Without this
+  -- the DROP COLUMN statements would silently delete all existing content.
+  INSERT INTO "pages_locales" ("title", "hero_type", "hero_rich_text", "meta_title", "meta_image_id", "meta_description", "_status", "_locale", "_parent_id")
+  SELECT "title", "hero_type", "hero_rich_text", "meta_title", "meta_image_id", "meta_description", "_status", 'en', "id" FROM "pages";
+  INSERT INTO "_pages_v_locales" ("version_title", "version_hero_type", "version_hero_rich_text", "version_meta_title", "version_meta_image_id", "version_meta_description", "version__status", "_locale", "_parent_id")
+  SELECT "version_title", "version_hero_type", "version_hero_rich_text", "version_meta_title", "version_meta_image_id", "version_meta_description", "version__status", 'en', "id" FROM "_pages_v";
+  INSERT INTO "posts_locales" ("title", "content", "meta_title", "meta_image_id", "meta_description", "_status", "_locale", "_parent_id")
+  SELECT "title", "content", "meta_title", "meta_image_id", "meta_description", "_status", 'en', "id" FROM "posts";
+  INSERT INTO "_posts_v_locales" ("version_title", "version_content", "version_meta_title", "version_meta_image_id", "version_meta_description", "version__status", "_locale", "_parent_id")
+  SELECT "version_title", "version_content", "version_meta_title", "version_meta_image_id", "version_meta_description", "version__status", 'en', "id" FROM "_posts_v";
+  INSERT INTO "media_locales" ("alt", "caption", "_locale", "_parent_id")
+  SELECT "alt", "caption", 'en', "id" FROM "media";
+  INSERT INTO "categories_locales" ("title", "_locale", "_parent_id")
+  SELECT "title", 'en', "id" FROM "categories";
+  INSERT INTO "search_locales" ("title", "_locale", "_parent_id")
+  SELECT "title", 'en', "id" FROM "search";
+  INSERT INTO "forms_locales" ("submit_button_label", "confirmation_message", "_locale", "_parent_id")
+  SELECT "submit_button_label", "confirmation_message", 'en', "id" FROM "forms";
+  INSERT INTO "forms_blocks_checkbox_locales" ("label", "_locale", "_parent_id")
+  SELECT "label", 'en', "id" FROM "forms_blocks_checkbox";
+  INSERT INTO "forms_blocks_country_locales" ("label", "_locale", "_parent_id")
+  SELECT "label", 'en', "id" FROM "forms_blocks_country";
+  INSERT INTO "forms_blocks_email_locales" ("label", "_locale", "_parent_id")
+  SELECT "label", 'en', "id" FROM "forms_blocks_email";
+  INSERT INTO "forms_blocks_message_locales" ("message", "_locale", "_parent_id")
+  SELECT "message", 'en', "id" FROM "forms_blocks_message";
+  INSERT INTO "forms_blocks_number_locales" ("label", "_locale", "_parent_id")
+  SELECT "label", 'en', "id" FROM "forms_blocks_number";
+  INSERT INTO "forms_blocks_select_options_locales" ("label", "_locale", "_parent_id")
+  SELECT "label", 'en', "id" FROM "forms_blocks_select_options";
+  INSERT INTO "forms_blocks_select_locales" ("label", "default_value", "_locale", "_parent_id")
+  SELECT "label", "default_value", 'en', "id" FROM "forms_blocks_select";
+  INSERT INTO "forms_blocks_state_locales" ("label", "_locale", "_parent_id")
+  SELECT "label", 'en', "id" FROM "forms_blocks_state";
+  INSERT INTO "forms_blocks_text_locales" ("label", "default_value", "_locale", "_parent_id")
+  SELECT "label", "default_value", 'en', "id" FROM "forms_blocks_text";
+  INSERT INTO "forms_blocks_textarea_locales" ("label", "default_value", "_locale", "_parent_id")
+  SELECT "label", "default_value", 'en', "id" FROM "forms_blocks_textarea";
+  INSERT INTO "forms_emails_locales" ("subject", "message", "_locale", "_parent_id")
+  SELECT "subject", "message", 'en', "id" FROM "forms_emails";
   ALTER TABLE "pages_blocks_media_block" DROP COLUMN "media_id";
   ALTER TABLE "pages" DROP COLUMN "title";
   ALTER TABLE "pages" DROP COLUMN "hero_type";
