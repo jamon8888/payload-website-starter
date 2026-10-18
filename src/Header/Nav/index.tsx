@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { SearchIcon } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useTranslations } from 'next-intl'
+import { localizedHref } from '@/i18n/path'
 
 export const HeaderNav: React.FC<{ data: HeaderType; locale: Locale }> = ({ data, locale }) => {
   const navItems = data?.navItems || []
@@ -21,7 +22,7 @@ export const HeaderNav: React.FC<{ data: HeaderType; locale: Locale }> = ({ data
       {navItems.map(({ link }, i) => {
         return <CMSLink key={i} locale={locale} {...link} appearance="link" />
       })}
-      <Link href={`/${locale === 'en' ? '' : locale}/search`}>
+      <Link href={localizedHref(locale, 'search')}>
         <span className="sr-only">{tSearch('label')}</span>
         <SearchIcon className="w-5 text-primary" />
       </Link>

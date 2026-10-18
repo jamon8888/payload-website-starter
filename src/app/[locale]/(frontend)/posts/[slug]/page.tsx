@@ -15,6 +15,7 @@ import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Locale, locales } from '@/i18n/config'
+import { localizedHref } from '@/i18n/path'
 import { AEOSection } from '@/blocks/AEO'
 import { ArticleMarkup, BreadcrumbMarkup } from '@/components/schema'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -57,7 +58,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   const { locale, slug = '' } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
-  const url = `/${locale === 'en' ? '' : locale}/posts/${decodedSlug}`
+  const url = localizedHref(locale, `posts/${decodedSlug}`)
   const post = await queryPostBySlug({ slug: decodedSlug, locale: locale as Locale })
 
   if (!post) return <PayloadRedirects locale={locale} url={url} />

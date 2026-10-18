@@ -214,11 +214,9 @@
   }
 }
 
-html {
-  opacity: 0;
-}
-
-html[data-theme='dark'],
-html[data-theme='light'] {
-  opacity: initial;
-}
+/* NOTE: the old `html { opacity: 0 }` flash-gate was removed. It revealed the
+   page only once `data-theme` was set by the beforeInteractive theme script,
+   which runs on hard load only. A client-side locale switch remounts <html>,
+   dropping the imperative `data-theme` attribute, so the whole page stayed at
+   `opacity: 0` (blank) until a hard reload. The theme script already applies
+   the theme pre-paint, so the gate was unnecessary. */

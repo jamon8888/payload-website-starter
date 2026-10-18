@@ -12,6 +12,7 @@ import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
+import { ThemeApplier } from '@/providers/Theme/ThemeApplier'
 import { SkipLink } from '@/components/a11y'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { notFound } from 'next/navigation'
@@ -53,6 +54,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
       <body>
+        <ThemeApplier locale={locale} />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>
             <AdminBar
