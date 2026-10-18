@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
-import { Locale, locales, localeNames } from '@/i18n/config'
+import { Locale, locales, defaultLocale, localeNames } from '@/i18n/config'
 import { useTranslations } from 'next-intl'
 
 export function LanguageSwitcher() {
@@ -10,13 +10,26 @@ export function LanguageSwitcher() {
   const router = useRouter()
   const t = useTranslations('languageSwitcher')
 
-  // Extract current locale from pathname
-  const currentLocale = (pathname.split('/')[1] as Locale) || 'en'
+  // Under the `as-needed` URL strategy (see src/proxy.ts) only non-default
+  // locales are prefixed. So the first path segment is the current locale only
+  // when it is one of the known locales; otherwise the page is default-locale
+  // (unprefixed) and the whole path belongs to the route.
+  const segments = pathname.split('/').filter(Boolean)
+  const firstSegment = segments[0]
+  const pathHasLocale = Boolean(firstSegment && locales.includes(firstSegment as Locale))
+
+  const currentLocale: Locale = pathHasLocale ? (firstSegment as Locale) : defaultLocale
+
+  // The route path with any locale prefix stripped, e.g. `/fr/posts` -> ['posts'].
+  const pathSegments = pathHasLocale ? segments.slice(1) : segments
 
   const switchLocale = (locale: Locale) => {
-    // Replace the locale in the pathname
-    const newPath = pathname.replace(`/${currentLocale}/`, `/${locale}/`).replace(`/${currentLocale}$`, `/${locale}`)
-    router.push(newPath)
+    // Rebuild the URL the same way getLocalizedPath does: default locale is
+    // unprefixed, every other locale gets a `/<locale>` prefix.
+    const prefix = locale === defaultLocale ? '' : `/${locale}`
+    const rest = pathSegments.length ? `/${pathSegments.join('/')}` : ''
+
+    router.push(`${prefix}${rest}` || '/')
   }
 
   return (
