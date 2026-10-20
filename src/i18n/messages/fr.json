@@ -62,7 +62,12 @@
     "footerNavigation": "Navigation du pied de page",
     "newWindow": "(nouvelle fenêtre)",
     "breadcrumb": "Fil d'Ariane",
-    "close": "Fermer"
+    "close": "Fermer",
+    "videoCaptionsMissing": "La vidéo ne peut pas être affichée : les sous-titres sont obligatoires pour la conformité accessibilité.",
+    "captionsLabel": "Sous-titres",
+    "showTranscript": "Afficher la transcription",
+    "audioDescription": "Audiodescription disponible :",
+    "download": "Télécharger"
   },
   "accessibility": {
     "metaTitle": "Déclaration d'accessibilité",
@@ -90,6 +95,10 @@
     "annualActionPlan": "Plan d'action annuel d'accessibilité",
     "technologiesUsed": "Technologies utilisées",
     "testEnvironment": "Environnement de test",
-    "testEnvironmentIntro": "Cette déclaration a été établie sur la base de tests automatisés et manuels utilisant les outils suivants :"
+    "testEnvironmentIntro": "Cette déclaration a été établie sur la base de tests automatisés et manuels utilisant les outils suivants :",
+    "contentStatements": "Déclarations d’accessibilité par contenu",
+    "noContentStatements": "Aucune déclaration par contenu n’a encore été publiée.",
+    "contentAccessibility": "Accessibilité de ce contenu",
+    "viewStatement": "Consulter la déclaration"
   }
 }

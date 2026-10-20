@@ -26,13 +26,18 @@ export const AccessibleImage: React.FC<AccessibleImageProps> = ({
 
   const { asset, role, alt } = image
 
+  // A decorative image carries no information, so it is hidden from assistive
+  // technologies. An informative image uses the alternative text authored on
+  // the block, falling back to the one stored on the media document.
+  const resolvedAlt = role === 'decorative' ? '' : alt || asset.alt || ''
+
   return (
     <MediaComponent
+      alt={resolvedAlt}
       className={className}
       imgClassName={imgClassName}
       pictureClassName={pictureClassName}
       resource={asset}
-      alt={role === 'decorative' ? '' : alt || ''}
     />
   )
 }

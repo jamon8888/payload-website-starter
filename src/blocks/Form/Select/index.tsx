@@ -14,6 +14,7 @@ import { Controller } from 'react-hook-form'
 
 import { Error } from '../Error'
 import { Width } from '../Width'
+import { fieldAriaProps } from '../fieldAria'
 
 export const Select: React.FC<
   SelectField & {
@@ -40,7 +41,11 @@ export const Select: React.FC<
 
           return (
             <SelectComponent onValueChange={(val) => onChange(val)} value={controlledValue?.value}>
-              <SelectTrigger className="w-full" id={name}>
+              <SelectTrigger
+                className="w-full"
+                id={name}
+                {...fieldAriaProps(name, errors)}
+              >
                 <SelectValue placeholder={label} />
               </SelectTrigger>
               <SelectContent>

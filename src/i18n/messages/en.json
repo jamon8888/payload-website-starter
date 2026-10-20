@@ -62,7 +62,12 @@
     "footerNavigation": "Footer navigation",
     "newWindow": "(new window)",
     "breadcrumb": "Breadcrumb",
-    "close": "Close"
+    "close": "Close",
+    "videoCaptionsMissing": "Video cannot be displayed: captions are required for accessibility compliance.",
+    "captionsLabel": "Captions",
+    "showTranscript": "Show transcript",
+    "audioDescription": "Audio description available:",
+    "download": "Download"
   },
   "accessibility": {
     "metaTitle": "Accessibility Statement",
@@ -90,6 +95,10 @@
     "annualActionPlan": "Annual Accessibility Action Plan",
     "technologiesUsed": "Technologies Used",
     "testEnvironment": "Test Environment",
-    "testEnvironmentIntro": "This statement was established based on automated and manual testing using the following tools:"
+    "testEnvironmentIntro": "This statement was established based on automated and manual testing using the following tools:",
+    "contentStatements": "Accessibility statements by content",
+    "noContentStatements": "No per-content statement has been published yet.",
+    "contentAccessibility": "Accessibility of this content",
+    "viewStatement": "View the statement"
   }
 }

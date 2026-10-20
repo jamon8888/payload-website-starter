@@ -8,6 +8,7 @@ import RichText from '@/components/RichText'
 import type { MediaBlock as MediaBlockProps } from '@/payload-types'
 
 import { Media } from '../../components/Media'
+import { AccessibleImage } from '@/components/a11y'
 
 type Props = MediaBlockProps & {
   breakout?: boolean
@@ -50,11 +51,20 @@ export const MediaBlock: React.FC<Props> = (props) => {
         className,
       )}
     >
-      {(mediaResource || staticImage) && (
+      {staticImage ? (
         <Media
           imgClassName={cn('border border-border rounded-[0.8rem]', imgClassName)}
           resource={mediaResource}
           src={staticImage}
+        />
+      ) : (
+        // `AccessibleImage` applies the block's own `role`/`alt`: a decorative
+        // image is rendered with an empty alt, an informative one with the
+        // editor-authored alternative. The media document's own alt stays the
+        // fallback for blocks that do not carry an accessible image group.
+        <AccessibleImage
+          image={image}
+          imgClassName={cn('border border-border rounded-[0.8rem]', imgClassName)}
         />
       )}
       {caption && (

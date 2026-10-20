@@ -65,6 +65,11 @@ export async function getDictionary(locale: Locale) {
       newWindow: t('a11y.newWindow'),
       breadcrumb: t('a11y.breadcrumb'),
       close: t('a11y.close'),
+      videoCaptionsMissing: t('a11y.videoCaptionsMissing'),
+      captionsLabel: t('a11y.captionsLabel'),
+      showTranscript: t('a11y.showTranscript'),
+      audioDescription: t('a11y.audioDescription'),
+      download: t('a11y.download'),
     },
     accessibility: {
       metaTitle: t('accessibility.metaTitle'),
@@ -93,6 +98,10 @@ export async function getDictionary(locale: Locale) {
       technologiesUsed: t('accessibility.technologiesUsed'),
       testEnvironment: t('accessibility.testEnvironment'),
       testEnvironmentIntro: t('accessibility.testEnvironmentIntro'),
+      contentStatements: t('accessibility.contentStatements'),
+      noContentStatements: t('accessibility.noContentStatements'),
+      contentAccessibility: t('accessibility.contentAccessibility'),
+      viewStatement: t('accessibility.viewStatement'),
     },
   }
 }

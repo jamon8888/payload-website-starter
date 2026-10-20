@@ -16,6 +16,9 @@ import { Locale, locales } from '@/i18n/config'
 import { localizedHref } from '@/i18n/path'
 import { AEOSection } from '@/blocks/AEO'
 import { BreadcrumbMarkup } from '@/components/schema'
+import { Breadcrumb } from '@/components/a11y'
+import { AccessibilityNotice } from '@/components/AccessibilityNotice'
+import { getAccessibilityStatementForContent } from '@/utilities/getAccessibilityStatements'
 import { getServerSideURL } from '@/utilities/getURL'
 
 export async function generateStaticParams() {
@@ -79,15 +82,27 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   const { hero, layout } = page
 
+  const accessibilityStatement = page.id
+    ? await getAccessibilityStatementForContent({
+        contentID: page.id,
+        relationTo: 'pages',
+        locale,
+      })
+    : null
+
   const serverUrl = getServerSideURL()
   const canonicalUrl = `${serverUrl}${url}`
 
   return (
     <article className="pt-16 pb-24">
       {decodedSlug !== 'home' && (
-        <BreadcrumbMarkup
-          items={[{ name: page.title || decodedSlug, item: canonicalUrl }]}
-        />
+        <>
+          <BreadcrumbMarkup items={[{ name: page.title || decodedSlug, item: canonicalUrl }]} />
+
+          <div className="container">
+            <Breadcrumb className="mb-6" items={[{ label: page.title || decodedSlug }]} />
+          </div>
+        </>
       )}
 
       <PageClient />
@@ -100,6 +115,8 @@ export default async function Page({ params: paramsPromise }: Args) {
       <RenderBlocks blocks={layout} />
 
       <AEOSection aeo={page.aeo} />
+
+      <AccessibilityNotice locale={locale} statement={accessibilityStatement} />
     </article>
   )
 }

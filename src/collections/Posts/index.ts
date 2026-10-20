@@ -11,9 +11,16 @@ import {
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { Accordion } from '../../blocks/Accordion/config'
 import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
+import { DataTable } from '../../blocks/DataTable/config'
+import { Embed } from '../../blocks/Embed/config'
+import { HowTo } from '../../blocks/HowTo/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
+import { ModalBlock } from '../../blocks/ModalBlock/config'
+import { Tabs } from '../../blocks/Tabs/config'
+import { Video } from '../../blocks/Video/config'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
@@ -118,7 +125,20 @@ export const Posts: CollectionConfig<'posts'> = {
                   return [
                     ...rootFeatures,
                     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    BlocksFeature({ blocks: [Banner, Code, MediaBlock] }),
+                    BlocksFeature({
+                      blocks: [
+                        Accordion,
+                        Banner,
+                        Code,
+                        DataTable,
+                        Embed,
+                        HowTo,
+                        MediaBlock,
+                        ModalBlock,
+                        Tabs,
+                        Video,
+                      ],
+                    }),
                     FixedToolbarFeature(),
                     InlineToolbarFeature(),
                     HorizontalRuleFeature(),

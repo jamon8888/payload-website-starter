@@ -4,17 +4,31 @@ import type { Page } from '@/payload-types'
 import { Locale } from '@/i18n/config'
 
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
+import { AccordionBlock } from '@/blocks/Accordion/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
+import { DataTableBlock } from '@/blocks/DataTable/Component'
+import { EmbedBlock } from '@/blocks/Embed/Component'
 import { FormBlock } from '@/blocks/Form/Component'
+import { HowToBlock } from '@/blocks/HowTo/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { ModalBlock } from '@/blocks/ModalBlock/Component'
+import { TabsBlock } from '@/blocks/Tabs/Component'
+import { VideoBlock } from '@/blocks/Video/Component'
 
 const blockComponents = {
+  accordion: AccordionBlock,
   archive: ArchiveBlock,
   content: ContentBlock,
   cta: CallToActionBlock,
+  dataTable: DataTableBlock,
+  embed: EmbedBlock,
   formBlock: FormBlock,
+  howTo: HowToBlock,
   mediaBlock: MediaBlock,
+  modal: ModalBlock,
+  tabs: TabsBlock,
+  video: VideoBlock,
 }
 
 export const RenderBlocks: React.FC<{

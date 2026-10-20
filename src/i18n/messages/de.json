@@ -62,7 +62,12 @@
     "footerNavigation": "Fußzeilennavigation",
     "newWindow": "(neues Fenster)",
     "breadcrumb": "Brotkrumennavigation",
-    "close": "Schließen"
+    "close": "Schließen",
+    "videoCaptionsMissing": "Das Video kann nicht angezeigt werden: Untertitel sind für die Barrierefreiheitskonformität erforderlich.",
+    "captionsLabel": "Untertitel",
+    "showTranscript": "Transkript anzeigen",
+    "audioDescription": "Audiodeskription verfügbar:",
+    "download": "Herunterladen"
   },
   "accessibility": {
     "metaTitle": "Erklärung zur Barrierefreiheit",
@@ -90,6 +95,10 @@
     "annualActionPlan": "Jährlicher Maßnahmenplan zur Barrierefreiheit",
     "technologiesUsed": "Eingesetzte Technologien",
     "testEnvironment": "Testumgebung",
-    "testEnvironmentIntro": "Diese Erklärung beruht auf automatisierten und manuellen Tests mit den folgenden Werkzeugen:"
+    "testEnvironmentIntro": "Diese Erklärung beruht auf automatisierten und manuellen Tests mit den folgenden Werkzeugen:",
+    "contentStatements": "Erklärungen zur Barrierefreiheit nach Inhalt",
+    "noContentStatements": "Es wurde noch keine Erklärung pro Inhalt veröffentlicht.",
+    "contentAccessibility": "Barrierefreiheit dieses Inhalts",
+    "viewStatement": "Erklärung ansehen"
   }
 }

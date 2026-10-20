@@ -57,8 +57,8 @@ export const Accordion: React.FC<AccordionProps> = ({
 }
 
 interface AccordionItemInternalProps extends AccordionItemProps {
-  isOpen: boolean
-  onToggle: (value: string) => void
+  isOpen?: boolean
+  onToggle?: (value: string) => void
 }
 
 export const AccordionItem: React.FC<AccordionItemInternalProps> = ({
@@ -73,7 +73,7 @@ export const AccordionItem: React.FC<AccordionItemInternalProps> = ({
     <div className="border border-border rounded-lg overflow-hidden">
       <button
         type="button"
-        onClick={() => !disabled && onToggle(value)}
+        onClick={() => !disabled && onToggle?.(value)}
         disabled={disabled}
         className={cn(
           'flex w-full items-center justify-between px-4 py-3 text-left font-medium transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',

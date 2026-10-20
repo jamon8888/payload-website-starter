@@ -54,8 +54,8 @@ export const Tabs: React.FC<TabsProps> = ({
 }
 
 interface TabsListProps {
-  value: string
-  onValueChange: (value: string) => void
+  value?: string
+  onValueChange?: (value: string) => void
   children: React.ReactNode
   className?: string
 }
@@ -73,7 +73,7 @@ export const TabsList: React.FC<TabsListProps> = ({
           const triggerValue = (child.props as TabsTriggerProps).value
           return React.cloneElement(child as React.ReactElement<any>, {
             isActive: value === triggerValue,
-            onClick: () => onValueChange(triggerValue),
+            onClick: () => onValueChange?.(triggerValue),
           })
         }
         return child

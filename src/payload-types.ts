@@ -72,6 +72,7 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    'accessibility-statements': AccessibilityStatement;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -94,6 +95,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    'accessibility-statements': AccessibilityStatementsSelect<false> | AccessibilityStatementsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -113,7 +115,7 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
-    'accessibility-statement': AccessibilityStatement;
+    'accessibility-statement': AccessibilityStatement1;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
@@ -204,7 +206,20 @@ export interface Page {
       | null;
     media?: (number | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (
+    | AccordionBlock
+    | ArchiveBlock
+    | CallToActionBlock
+    | ContentBlock
+    | DataTableBlock
+    | EmbedBlock
+    | FormBlock
+    | HowToBlock
+    | MediaBlock
+    | ModalBlock
+    | TabsBlock
+    | VideoBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -487,6 +502,68 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AccordionBlock".
+ */
+export interface AccordionBlock {
+  items: {
+    title: string;
+    content?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'accordion';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ArchiveBlock".
+ */
+export interface ArchiveBlock {
+  introContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  populateBy?: ('collection' | 'selection') | null;
+  relationTo?: 'posts' | null;
+  categories?: (number | Category)[] | null;
+  limit?: number | null;
+  selectedDocs?:
+    | {
+        relationTo: 'posts';
+        value: number | Post;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'archive';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "CallToActionBlock".
  */
 export interface CallToActionBlock {
@@ -585,54 +662,49 @@ export interface ContentBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "MediaBlock".
+ * via the `definition` "DataTableBlock".
  */
-export interface MediaBlock {
-  image: {
-    asset: number | Media;
-    role: 'informative' | 'decorative';
-    /**
-     * Required for informative images. Leave empty for decorative images.
-     */
-    alt?: string | null;
-  };
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'mediaBlock';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ArchiveBlock".
- */
-export interface ArchiveBlock {
-  introContent?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  populateBy?: ('collection' | 'selection') | null;
-  relationTo?: 'posts' | null;
-  categories?: (number | Category)[] | null;
-  limit?: number | null;
-  selectedDocs?:
+export interface DataTableBlock {
+  /**
+   * Mandatory: it names the table for people who cannot see it.
+   */
+  caption: string;
+  header: {
+    cell: string;
+    id?: string | null;
+  }[];
+  rows?:
     | {
-        relationTo: 'posts';
-        value: number | Post;
+        cells?:
+          | {
+              cell?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
       }[]
     | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'archive';
+  blockType: 'dataTable';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EmbedBlock".
+ */
+export interface EmbedBlock {
+  url: string;
+  /**
+   * Accessible name of the frame. Describe what the embedded content shows.
+   */
+  title: string;
+  /**
+   * Displayed below the frame, as a text alternative to the embedded content.
+   */
+  description?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'embed';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -824,6 +896,213 @@ export interface Form {
     | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HowToBlock".
+ */
+export interface HowToBlock {
+  name: string;
+  description?: string | null;
+  steps: {
+    name: string;
+    text: string;
+    url?: string | null;
+    id?: string | null;
+  }[];
+  /**
+   * ISO 8601 duration, e.g. PT30M for 30 minutes.
+   */
+  totalTime?: string | null;
+  estimatedCost?: {
+    currency?: string | null;
+    value?: number | null;
+  };
+  supply?:
+    | {
+        name?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  tool?:
+    | {
+        name?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'howTo';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MediaBlock".
+ */
+export interface MediaBlock {
+  image: {
+    asset: number | Media;
+    role: 'informative' | 'decorative';
+    /**
+     * Required for informative images. Leave empty for decorative images.
+     */
+    alt?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mediaBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ModalBlock".
+ */
+export interface ModalBlock {
+  triggerLabel: string;
+  title?: string | null;
+  description?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'modal';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TabsBlock".
+ */
+export interface TabsBlock {
+  items: {
+    label: string;
+    content?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'tabs';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoBlock".
+ */
+export interface VideoBlock {
+  video: {
+    asset: number | Media;
+    /**
+     * WebVTT caption file required for accessibility compliance
+     */
+    captions: number | Media;
+    transcript: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    /**
+     * Required if video conveys visual information not in the main audio
+     */
+    audioDescription?: (number | null) | Media;
+  };
+  /**
+   * Displayed next to the video and used as its accessible name.
+   */
+  title: string;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'video';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accessibility-statements".
+ */
+export interface AccessibilityStatement {
+  id: number;
+  title: string;
+  /**
+   * The page or post this statement applies to.
+   */
+  content:
+    | {
+        relationTo: 'pages';
+        value: number | Page;
+      }
+    | {
+        relationTo: 'posts';
+        value: number | Post;
+      };
+  complianceStatus: 'conformant' | 'partiallyConformant' | 'nonConformant';
+  auditDate: string;
+  referentielVersion: string;
+  globalComplianceRate: number;
+  nonConformCriteria?:
+    | {
+        criterion: string;
+        thematic: string;
+        derogation?: boolean | null;
+        justification?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  contactEmail: string;
+  statement?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  schemaPluriannuelUrl?: string | null;
+  planActionAnnuelUrl?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1036,6 +1315,10 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'accessibility-statements';
+        value: number | AccessibilityStatement;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -1128,11 +1411,18 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
+        accordion?: T | AccordionBlockSelect<T>;
+        archive?: T | ArchiveBlockSelect<T>;
         cta?: T | CallToActionBlockSelect<T>;
         content?: T | ContentBlockSelect<T>;
-        mediaBlock?: T | MediaBlockSelect<T>;
-        archive?: T | ArchiveBlockSelect<T>;
+        dataTable?: T | DataTableBlockSelect<T>;
+        embed?: T | EmbedBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        howTo?: T | HowToBlockSelect<T>;
+        mediaBlock?: T | MediaBlockSelect<T>;
+        modal?: T | ModalBlockSelect<T>;
+        tabs?: T | TabsBlockSelect<T>;
+        video?: T | VideoBlockSelect<T>;
       };
   meta?:
     | T
@@ -1160,6 +1450,35 @@ export interface PagesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "AccordionBlock_select".
+ */
+export interface AccordionBlockSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        title?: T;
+        content?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ArchiveBlock_select".
+ */
+export interface ArchiveBlockSelect<T extends boolean = true> {
+  introContent?: T;
+  populateBy?: T;
+  relationTo?: T;
+  categories?: T;
+  limit?: T;
+  selectedDocs?: T;
+  id?: T;
+  blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1213,6 +1532,91 @@ export interface ContentBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DataTableBlock_select".
+ */
+export interface DataTableBlockSelect<T extends boolean = true> {
+  caption?: T;
+  header?:
+    | T
+    | {
+        cell?: T;
+        id?: T;
+      };
+  rows?:
+    | T
+    | {
+        cells?:
+          | T
+          | {
+              cell?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EmbedBlock_select".
+ */
+export interface EmbedBlockSelect<T extends boolean = true> {
+  url?: T;
+  title?: T;
+  description?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FormBlock_select".
+ */
+export interface FormBlockSelect<T extends boolean = true> {
+  form?: T;
+  enableIntro?: T;
+  introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HowToBlock_select".
+ */
+export interface HowToBlockSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  steps?:
+    | T
+    | {
+        name?: T;
+        text?: T;
+        url?: T;
+        id?: T;
+      };
+  totalTime?: T;
+  estimatedCost?:
+    | T
+    | {
+        currency?: T;
+        value?: T;
+      };
+  supply?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  tool?:
+    | T
+    | {
+        name?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "MediaBlock_select".
  */
 export interface MediaBlockSelect<T extends boolean = true> {
@@ -1228,26 +1632,45 @@ export interface MediaBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ArchiveBlock_select".
+ * via the `definition` "ModalBlock_select".
  */
-export interface ArchiveBlockSelect<T extends boolean = true> {
-  introContent?: T;
-  populateBy?: T;
-  relationTo?: T;
-  categories?: T;
-  limit?: T;
-  selectedDocs?: T;
+export interface ModalBlockSelect<T extends boolean = true> {
+  triggerLabel?: T;
+  title?: T;
+  description?: T;
+  content?: T;
   id?: T;
   blockName?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FormBlock_select".
+ * via the `definition` "TabsBlock_select".
  */
-export interface FormBlockSelect<T extends boolean = true> {
-  form?: T;
-  enableIntro?: T;
-  introContent?: T;
+export interface TabsBlockSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        label?: T;
+        content?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VideoBlock_select".
+ */
+export interface VideoBlockSelect<T extends boolean = true> {
+  video?:
+    | T
+    | {
+        asset?: T;
+        captions?: T;
+        transcript?: T;
+        audioDescription?: T;
+      };
+  title?: T;
   id?: T;
   blockName?: T;
 }
@@ -1434,6 +1857,36 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "accessibility-statements_select".
+ */
+export interface AccessibilityStatementsSelect<T extends boolean = true> {
+  title?: T;
+  content?: T;
+  complianceStatus?: T;
+  auditDate?: T;
+  referentielVersion?: T;
+  globalComplianceRate?: T;
+  nonConformCriteria?:
+    | T
+    | {
+        criterion?: T;
+        thematic?: T;
+        derogation?: T;
+        justification?: T;
+        id?: T;
+      };
+  contactEmail?: T;
+  statement?: T;
+  schemaPluriannuelUrl?: T;
+  planActionAnnuelUrl?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1772,7 +2225,7 @@ export interface Footer {
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "accessibility-statement".
  */
-export interface AccessibilityStatement {
+export interface AccessibilityStatement1 {
   id: number;
   auditDate: string;
   referentielVersion: string;

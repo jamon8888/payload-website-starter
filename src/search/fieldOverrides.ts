@@ -22,17 +22,22 @@ export const searchFields: Field[] = [
         type: 'text',
         name: 'title',
         label: 'Title',
+        // Localized like the source `meta` fields, so each locale of a post is
+        // indexed and searched in its own language.
+        localized: true,
       },
       {
         type: 'text',
         name: 'description',
         label: 'Description',
+        localized: true,
       },
       {
         name: 'image',
         label: 'Image',
         type: 'upload',
         relationTo: 'media',
+        localized: true,
       },
     ],
   },

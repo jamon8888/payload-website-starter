@@ -13,6 +13,7 @@ import React from 'react'
 import { Controller } from 'react-hook-form'
 
 import { Error } from '../Error'
+import { fieldAriaProps } from '../fieldAria'
 import { Width } from '../Width'
 import { countryOptions } from './options'
 
@@ -42,7 +43,11 @@ export const Country: React.FC<
 
           return (
             <Select onValueChange={(val) => onChange(val)} value={controlledValue?.value}>
-              <SelectTrigger className="w-full" id={name}>
+              <SelectTrigger
+                className="w-full"
+                id={name}
+                {...fieldAriaProps(name, errors)}
+              >
                 <SelectValue placeholder={label} />
               </SelectTrigger>
               <SelectContent>

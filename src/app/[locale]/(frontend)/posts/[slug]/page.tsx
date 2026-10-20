@@ -18,7 +18,11 @@ import { Locale, locales } from '@/i18n/config'
 import { localizedHref } from '@/i18n/path'
 import { AEOSection } from '@/blocks/AEO'
 import { ArticleMarkup, BreadcrumbMarkup } from '@/components/schema'
+import { Breadcrumb } from '@/components/a11y'
+import { AccessibilityNotice } from '@/components/AccessibilityNotice'
+import { getAccessibilityStatementForContent } from '@/utilities/getAccessibilityStatements'
 import { getServerSideURL } from '@/utilities/getURL'
+import { getTranslations } from 'next-intl/server'
 
 export async function generateStaticParams() {
   // During build, PAYLOAD_SECRET may not be available
@@ -66,6 +70,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   const serverUrl = getServerSideURL()
   const localePrefix = locale === 'en' ? '' : `/${locale}`
   const canonicalUrl = `${serverUrl}${localePrefix}/posts/${decodedSlug}`
+  const t = await getTranslations({ locale, namespace: 'posts' })
 
   const heroImage = post.heroImage
   const imageUrl =
@@ -78,6 +83,14 @@ export default async function Post({ params: paramsPromise }: Args) {
     firstAuthor && typeof firstAuthor === 'object' && 'user' in firstAuthor
       ? (firstAuthor.user as { name?: string | null } | null)
       : null
+
+  const accessibilityStatement = post.id
+    ? await getAccessibilityStatementForContent({
+        contentID: post.id,
+        relationTo: 'posts',
+        locale,
+      })
+    : null
 
   return (
     <article className="pt-16 pb-16">
@@ -98,6 +111,16 @@ export default async function Post({ params: paramsPromise }: Args) {
         ]}
       />
 
+      <div className="container">
+        <Breadcrumb
+          className="mb-6"
+          items={[
+            { label: t('posts'), href: `${serverUrl}${localePrefix}/posts` },
+            { label: post.title || decodedSlug },
+          ]}
+        />
+      </div>
+
       <PageClient />
 
       {/* Allows redirects for valid pages too */}
@@ -112,6 +135,8 @@ export default async function Post({ params: paramsPromise }: Args) {
           <RichText className="max-w-[48rem] mx-auto" data={post.content} enableGutter={false} />
 
           <AEOSection aeo={post.aeo} />
+
+          <AccessibilityNotice locale={locale} statement={accessibilityStatement} />
 
           {post.relatedPosts && post.relatedPosts.length > 0 && (
             <RelatedPosts

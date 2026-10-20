@@ -9,6 +9,7 @@ import React from 'react'
 
 import { Error } from '../Error'
 import { Width } from '../Width'
+import { fieldAriaProps } from '../fieldAria'
 
 export const Checkbox: React.FC<
   CheckboxField & {
@@ -26,6 +27,7 @@ export const Checkbox: React.FC<
           defaultChecked={defaultValue}
           id={name}
           {...props}
+          {...fieldAriaProps(name, errors)}
           onCheckedChange={(checked) => {
             setValue(props.name, checked)
           }}

@@ -1,6 +1,7 @@
 import * as migration_20260918_151143_initial from './20260918_151143_initial';
 import * as migration_20261006_162727_multilingual_aeo_accessibility from './20261006_162727_multilingual_aeo_accessibility';
 import * as migration_20261006_163512_localize_link_labels from './20261006_163512_localize_link_labels';
+import * as migration_20261020_180247_accessibility_statements_and_localized_search from './20261020_180247_accessibility_statements_and_localized_search';
 
 export const migrations = [
   {
@@ -16,6 +17,11 @@ export const migrations = [
   {
     up: migration_20261006_163512_localize_link_labels.up,
     down: migration_20261006_163512_localize_link_labels.down,
-    name: '20261006_163512_localize_link_labels'
+    name: '20261006_163512_localize_link_labels',
+  },
+  {
+    up: migration_20261020_180247_accessibility_statements_and_localized_search.up,
+    down: migration_20261020_180247_accessibility_statements_and_localized_search.down,
+    name: '20261020_180247_accessibility_statements_and_localized_search'
   },
 ];

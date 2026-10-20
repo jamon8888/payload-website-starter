@@ -3,9 +3,12 @@ import React from 'react'
 import { notFound } from 'next/navigation'
 
 import { getCachedGlobal } from '@/utilities/getGlobals'
+import { getAccessibilityStatements } from '@/utilities/getAccessibilityStatements'
 import { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionary'
 import { cn } from '@/utilities/ui'
+import { localizedHref } from '@/i18n/path'
+import Link from 'next/link'
 
 interface AccessibilityStatementPageProps {
   params: Promise<{ locale: Locale }>
@@ -29,6 +32,8 @@ export default async function AccessibilityStatementPage({ params }: Accessibili
   if (!statement) {
     notFound()
   }
+
+  const statements = await getAccessibilityStatements(locale)
 
   const { auditDate, referentielVersion, globalComplianceRate, nonConformCriteria, contactEmail, schemaPluriannuelUrl, planActionAnnuelUrl } = statement
 
@@ -214,6 +219,36 @@ export default async function AccessibilityStatementPage({ params }: Accessibili
             </ul>
           </section>
         )}
+
+        <section aria-labelledby="registry" className="mb-12">
+          <h2 id="registry" className="text-2xl font-semibold mb-4">
+            {a.contentStatements}
+          </h2>
+          {statements.length > 0 ? (
+            <ul className="space-y-3 list-disc list-inside">
+              {statements.map((statement) => (
+                <li key={statement.id}>
+                  <Link
+                    className="text-primary hover:underline"
+                    href={localizedHref(locale, `accessibilite/${statement.slug}`)}
+                  >
+                    {statement.title}
+                  </Link>{' '}
+                  <span className="text-muted-foreground">
+                    —{' '}
+                    {statement.complianceStatus === 'conformant'
+                      ? a.fullyCompliant
+                      : statement.complianceStatus === 'nonConformant'
+                        ? a.nonCompliant
+                        : a.partiallyCompliant}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground">{a.noContentStatements}</p>
+          )}
+        </section>
 
         <section aria-labelledby="technologies" className="mb-12">
           <h2 id="technologies" className="text-2xl font-semibold mb-4">

@@ -2,11 +2,18 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '../../access/authenticated'
 import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
+import { Accordion } from '../../blocks/Accordion/config'
 import { Archive } from '../../blocks/ArchiveBlock/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { Content } from '../../blocks/Content/config'
+import { DataTable } from '../../blocks/DataTable/config'
+import { Embed } from '../../blocks/Embed/config'
 import { FormBlock } from '../../blocks/Form/config'
+import { HowTo } from '../../blocks/HowTo/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
+import { ModalBlock } from '../../blocks/ModalBlock/config'
+import { Tabs } from '../../blocks/Tabs/config'
+import { Video } from '../../blocks/Video/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -100,7 +107,20 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock],
+              blocks: [
+                Accordion,
+                Archive,
+                CallToAction,
+                Content,
+                DataTable,
+                Embed,
+                FormBlock,
+                HowTo,
+                MediaBlock,
+                ModalBlock,
+                Tabs,
+                Video,
+              ],
               required: true,
               localized: true,
               admin: {

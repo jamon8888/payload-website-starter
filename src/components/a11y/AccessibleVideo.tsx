@@ -1,6 +1,5 @@
-'use client'
-
 import React from 'react'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { cn } from '@/utilities/ui'
 import type { Media } from '@/payload-types'
 
@@ -10,16 +9,21 @@ interface AccessibleVideoProps {
   video: {
     asset: number | Media
     captions: number | Media
-    transcript: string
     audioDescription?: number | Media | null
   } | null
+  /** Rendered transcript — a rich text, so it is passed in already rendered. */
+  transcript?: React.ReactNode
   className?: string
 }
 
-export const AccessibleVideo: React.FC<AccessibleVideoProps> = ({
+export const AccessibleVideo: React.FC<AccessibleVideoProps> = async ({
   video,
+  transcript,
   className,
 }) => {
+  const t = await getTranslations('a11y')
+  const locale = await getLocale()
+
   if (!video || !video.asset || typeof video.asset === 'number') {
     return null
   }
@@ -28,7 +32,7 @@ export const AccessibleVideo: React.FC<AccessibleVideoProps> = ({
   if (!video.captions || typeof video.captions === 'number') {
     return (
       <div className={className} role="alert">
-        <p>Video cannot be displayed: captions are required for accessibility compliance.</p>
+        <p>{t('videoCaptionsMissing')}</p>
       </div>
     )
   }
@@ -41,44 +45,36 @@ export const AccessibleVideo: React.FC<AccessibleVideoProps> = ({
 
   return (
     <div className={className}>
-      <video
-        controls
-        playsInline
-        className={cn('w-full max-w-lg')}
-      >
+      <video controls playsInline className={cn('w-full max-w-lg')}>
         <source src={videoUrl} type={mimeType} />
         <track
           kind="captions"
           src={captionsUrl}
-          srcLang="fr"
-          label="Français"
+          srcLang={locale}
+          label={t('captionsLabel')}
           default
         />
       </video>
 
-      {video.transcript && (
+      {transcript ? (
         <details className="mt-4">
-          <summary className="cursor-pointer font-medium">
-            Afficher la transcription
-          </summary>
-          <div className="mt-2 prose prose-sm max-w-none">
-            <div dangerouslySetInnerHTML={{ __html: video.transcript }} />
-          </div>
+          <summary className="cursor-pointer font-medium">{t('showTranscript')}</summary>
+          <div className="mt-2 prose prose-sm max-w-none">{transcript}</div>
         </details>
-      )}
+      ) : null}
 
-      {video.audioDescription && typeof video.audioDescription === 'object' && (
+      {video.audioDescription && typeof video.audioDescription === 'object' ? (
         <p className="mt-2 text-sm text-muted-foreground">
-          Audiodescription disponible:{" "}
+          {t('audioDescription')}{' '}
           <a
             href={getMediaUrl(`/media/${(video.audioDescription as Media).filename}`)}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Télécharger
+            {t('download')}
           </a>
         </p>
-      )}
+      ) : null}
     </div>
   )
 }
