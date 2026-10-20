@@ -68,7 +68,10 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
 
     width = fullWidth!
     height = fullHeight!
-    alt = altFromResource || ''
+    // An explicit alt wins over the one stored on the media document: the
+    // accessible image group carries the alternative text (and an empty one for
+    // a decorative image), so it must not be overwritten here.
+    alt = altFromProps ?? altFromResource ?? ''
 
     const cacheTag = resource.updatedAt
 
