@@ -56,13 +56,20 @@ export async function GET() {
   for (const { locale, pages, posts } of perLocale) {
     const prefix = localePrefixFor(locale)
 
+    // The summary lives in the `aeo` group (`aeo.aeoSummary`), not at the root
+    // of the document.
     const pageLines = pages
-      .filter((page: any) => page?.slug !== 'home' && page?.aeoSummary)
-      .map((page: any) => `- [${page.title}](${siteUrl}${prefix}/${page.slug}): ${page.aeoSummary}`)
+      .filter((page: any) => page?.slug !== 'home' && page?.aeo?.aeoSummary)
+      .map(
+        (page: any) => `- [${page.title}](${siteUrl}${prefix}/${page.slug}): ${page.aeo.aeoSummary}`,
+      )
 
     const postLines = posts
-      .filter((post: any) => post?.aeoSummary)
-      .map((post: any) => `- [${post.title}](${siteUrl}${prefix}/posts/${post.slug}): ${post.aeoSummary}`)
+      .filter((post: any) => post?.aeo?.aeoSummary)
+      .map(
+        (post: any) =>
+          `- [${post.title}](${siteUrl}${prefix}/posts/${post.slug}): ${post.aeo.aeoSummary}`,
+      )
 
     const sectionLines = [...pageLines, ...postLines]
     if (!sectionLines.length) continue
