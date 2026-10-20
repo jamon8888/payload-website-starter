@@ -99,7 +99,7 @@ export default async function StatementPage({ params }: StatementPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <main id="main-content" className="container py-12">
+      <div className="container py-12">
         <header className="mb-12">
           <h1 className="text-3xl font-bold mb-4">{statement.title}</h1>
           <p className="text-muted-foreground">
@@ -185,7 +185,7 @@ export default async function StatementPage({ params }: StatementPageProps) {
             </a>
           </address>
         </section>
-      </main>
+      </div>
     </>
   )
 }

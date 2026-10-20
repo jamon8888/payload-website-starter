@@ -75,7 +75,7 @@ export default async function AccessibilityStatementPage({ params }: Accessibili
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <main id="main-content" className="container py-12">
+      <div className="container py-12">
         <header className="mb-12">
           <h1 className="text-3xl font-bold mb-4">{a.title}</h1>
           <p className="text-muted-foreground">{a.intro}</p>
@@ -277,7 +277,7 @@ export default async function AccessibilityStatementPage({ params }: Accessibili
             <li>Zoom up to 200% / 400%</li>
           </ul>
         </section>
-      </main>
+      </div>
     </>
   )
 }
