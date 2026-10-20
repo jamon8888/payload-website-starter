@@ -1,13 +1,13 @@
 import type { GlobalAfterChangeHook } from 'payload'
 
-import { revalidateTag } from 'next/cache.js'
+import { safeRevalidateTag } from '../../utilities/revalidate'
 
 export const revalidateFooter: GlobalAfterChangeHook = ({ doc, req: { payload, context, locale } }) => {
   if (!context.disableRevalidate) {
     const currentLocale = locale || 'en'
     payload.logger.info(`Revalidating footer for locale: ${currentLocale}`)
 
-    revalidateTag(`global_footer_${currentLocale}`, 'max')
+    safeRevalidateTag(`global_footer_${currentLocale}`, payload.logger)
   }
 
   return doc

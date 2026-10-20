@@ -1,12 +1,12 @@
 import type { CollectionAfterChangeHook } from 'payload'
 
-import { revalidateTag } from 'next/cache.js'
+import { safeRevalidateTag } from '../utilities/revalidate'
 
 export const revalidateRedirects: CollectionAfterChangeHook = ({ doc, req: { payload, locale } }) => {
   const currentLocale = locale || 'en'
   payload.logger.info(`Revalidating redirects for locale: ${currentLocale}`)
 
-  revalidateTag(`redirects_${currentLocale}`, 'max')
+  safeRevalidateTag(`redirects_${currentLocale}`, payload.logger)
 
   return doc
 }

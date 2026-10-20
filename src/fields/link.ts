@@ -72,10 +72,24 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
     },
     hooks: {
       beforeValidate: [
-        ({ data, req }) => {
-          const label = data?.label
-          if (typeof label === 'string' && label) {
-            const normalized = label.trim().toLowerCase()
+        ({ value, req }) => {
+          // `value` is this group's value. `data` would be the whole document,
+          // and returning it here would replace the field with the document
+          // itself — a circular reference that blows up Payload's deep copy.
+          const label = (value as { label?: unknown } | undefined)?.label
+          const labels = Array.isArray(label)
+            ? label
+            : typeof label === 'string'
+              ? [label]
+              : label && typeof label === 'object'
+                ? Object.values(label as Record<string, unknown>)
+                : []
+
+          for (const candidate of labels) {
+            if (typeof candidate !== 'string' || !candidate) continue
+
+            const normalized = candidate.trim().toLowerCase()
+
             if (GENERIC_LINK_LABELS.includes(normalized)) {
               // Surface the message in the editor's own admin language.
               const adminLocale = (req?.locale ?? 'en') as keyof typeof NON_EXPLICIT_LABEL_ERROR
@@ -84,7 +98,8 @@ export const link: LinkType = ({ appearances, disableLabel = false, overrides = 
               )
             }
           }
-          return data
+
+          return value
         },
       ],
     },

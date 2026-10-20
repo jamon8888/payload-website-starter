@@ -1,8 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
-import { revalidatePath, revalidateTag } from 'next/cache.js'
-
 import type { Page } from '../../../payload-types'
+import { safeRevalidatePath, safeRevalidateTag } from '../../../utilities/revalidate'
 
 export const revalidatePage: CollectionAfterChangeHook<Page> = ({
   doc,
@@ -18,8 +17,8 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 
       payload.logger.info(`Revalidating page at path: ${path}`)
 
-      revalidatePath(path)
-      revalidateTag(`pages-sitemap_${currentLocale}`, 'max')
+      safeRevalidatePath(path, payload.logger)
+      safeRevalidateTag(`pages-sitemap_${currentLocale}`, payload.logger)
     }
 
     // If the page was previously published, we need to revalidate the old path
@@ -28,8 +27,8 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 
       payload.logger.info(`Revalidating old page at path: ${oldPath}`)
 
-      revalidatePath(oldPath)
-      revalidateTag(`pages-sitemap_${currentLocale}`, 'max')
+      safeRevalidatePath(oldPath, payload.logger)
+      safeRevalidateTag(`pages-sitemap_${currentLocale}`, payload.logger)
     }
   }
   return doc
@@ -40,8 +39,8 @@ export const revalidateDelete: CollectionAfterDeleteHook<Page> = ({ doc, req: { 
     const currentLocale = locale || 'en'
     const localePrefix = currentLocale === 'en' ? '' : `/${currentLocale}`
     const path = doc?.slug === 'home' ? `${localePrefix}/` : `${localePrefix}/${doc?.slug}`
-    revalidatePath(path)
-    revalidateTag(`pages-sitemap_${currentLocale}`, 'max')
+    safeRevalidatePath(path)
+    safeRevalidateTag(`pages-sitemap_${currentLocale}`)
   }
 
   return doc
