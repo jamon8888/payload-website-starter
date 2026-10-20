@@ -32,6 +32,13 @@ export const getLocalizedPath = (args: {
   const { collectionPrefix = '', slug, locale } = args
   const localePrefix = locale && locale !== 'en' ? `/${locale}` : ''
 
+  // The home page lives at the root of its locale (`/`, `/fr`, `/de`, …).
+  // The `home` slug is only how the page is stored, so it must not leak into
+  // the canonical URL — `/home` is a second URL for the very same page.
+  if (!collectionPrefix && slug === 'home') {
+    return localePrefix || '/'
+  }
+
   return `${localePrefix}${collectionPrefix}${slug ? `/${slug}` : ''}` || '/'
 }
 

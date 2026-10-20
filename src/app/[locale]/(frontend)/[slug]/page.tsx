@@ -80,8 +80,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   const { hero, layout } = page
 
   const serverUrl = getServerSideURL()
-  const localePrefix = locale === 'en' ? '' : `/${locale}`
-  const canonicalUrl = `${serverUrl}${localePrefix}/${decodedSlug === 'home' ? '' : decodedSlug}`
+  const canonicalUrl = `${serverUrl}${url}`
 
   return (
     <article className="pt-16 pb-24">
