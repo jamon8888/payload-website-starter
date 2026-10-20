@@ -1,7 +1,7 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
 import type { Page } from '../../../payload-types'
-import { safeRevalidatePath, safeRevalidateTag } from '../../../utilities/revalidate'
+import { localePath, safeRevalidatePath, safeRevalidateTag } from '../../../utilities/revalidate'
 
 export const revalidatePage: CollectionAfterChangeHook<Page> = ({
   doc,
@@ -10,10 +10,9 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 }) => {
   if (!context.disableRevalidate) {
     const currentLocale = locale || 'en'
-    const localePrefix = currentLocale === 'en' ? '' : `/${currentLocale}`
 
     if (doc._status === 'published') {
-      const path = doc.slug === 'home' ? `${localePrefix}/` : `${localePrefix}/${doc.slug}`
+      const path = doc.slug === 'home' ? localePath(currentLocale) : localePath(currentLocale, `/${doc.slug}`)
 
       payload.logger.info(`Revalidating page at path: ${path}`)
 
@@ -23,7 +22,10 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 
     // If the page was previously published, we need to revalidate the old path
     if (previousDoc?._status === 'published' && doc._status !== 'published') {
-      const oldPath = previousDoc.slug === 'home' ? `${localePrefix}/` : `${localePrefix}/${previousDoc.slug}`
+      const oldPath =
+        previousDoc.slug === 'home'
+          ? localePath(currentLocale)
+          : localePath(currentLocale, `/${previousDoc.slug}`)
 
       payload.logger.info(`Revalidating old page at path: ${oldPath}`)
 
@@ -37,8 +39,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 export const revalidateDelete: CollectionAfterDeleteHook<Page> = ({ doc, req: { context, locale } }) => {
   if (!context.disableRevalidate) {
     const currentLocale = locale || 'en'
-    const localePrefix = currentLocale === 'en' ? '' : `/${currentLocale}`
-    const path = doc?.slug === 'home' ? `${localePrefix}/` : `${localePrefix}/${doc?.slug}`
+    const path = doc?.slug === 'home' ? localePath(currentLocale) : localePath(currentLocale, `/${doc?.slug}`)
     safeRevalidatePath(path)
     safeRevalidateTag(`pages-sitemap_${currentLocale}`)
   }

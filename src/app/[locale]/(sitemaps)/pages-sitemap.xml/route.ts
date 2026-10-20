@@ -64,18 +64,13 @@ async function fetchPagesSitemap(locale: Locale): Promise<any> {
     return [...defaultSitemap, ...sitemap]
 }
 
-// Cache the typed function
-async function getPagesSitemapCached(locale: Locale) {
-  return fetchPagesSitemap(locale)
-}
-
-const getPagesSitemap = unstable_cache(
-  getPagesSitemapCached,
-  ['pages-sitemap'],
-  {
-    tags: ['pages-sitemap'],
-  },
-)
+// Cached per locale: the tag has to match the one the Payload hooks
+// revalidate (`pages-sitemap_<locale>`), otherwise the sitemap is never
+// invalidated and stays frozen at its first render.
+const getPagesSitemap = (locale: Locale) =>
+  unstable_cache(fetchPagesSitemap, ['pages-sitemap', locale], {
+    tags: [`pages-sitemap_${locale}`],
+  })(locale)
 
 interface RouteProps {
   params: Promise<{ locale: Locale }>

@@ -5,6 +5,17 @@ type Logger = {
 }
 
 /**
+ * Every frontend route lives under `src/app/[locale]/`, so the *internal* path
+ * always carries the locale segment — English is served from the unprefixed
+ * URL through the proxy rewrite, but the rendered page (and therefore its
+ * cache entry) is `/en/...`.
+ *
+ * `revalidatePath` works on internal paths, so revalidating `/posts` would
+ * silently do nothing for the default locale.
+ */
+export const localePath = (locale: string, path = ''): string => `/${locale}${path}`
+
+/**
  * Next.js cache invalidation only works inside a request or render context.
  *
  * Payload also runs outside of Next — CLI scripts, cron jobs, seed scripts — and
