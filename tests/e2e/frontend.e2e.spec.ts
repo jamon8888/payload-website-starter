@@ -18,7 +18,9 @@ test.describe('Frontend', () => {
 
   test('can load homepage', async ({ page }) => {
     await page.goto(path('en'))
-    await expect(page).toHaveTitle(/Payload Website Template/)
+    // The title carries the brand name of the `site-settings` global, which
+    // defaults to "Payload Website" and is editable from the admin panel.
+    await expect(page).toHaveTitle(/Payload Website/)
     const heading = page.locator('h1').first()
     await expect(heading).toHaveText('Payload Website Template')
   })
