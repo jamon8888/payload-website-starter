@@ -127,6 +127,18 @@ jobs:
           NEXT_PUBLIC_SERVER_URL: http://localhost:3000
       - name: Install Playwright
         run: pnpm exec playwright install --with-deps chromium
+      # The e2e tests assert on the content (a post with its JSON-LD, the
+      # translated chrome): the database is empty after the migrations, so the
+      # content has to be seeded before the run.
+      - name: Seed content for e2e tests
+        run: pnpm seed:local
+        env:
+          POSTGRES_URL: postgresql://postgres:postgres@localhost:5432/payload
+          PAYLOAD_SECRET: test-secret
+          BLOB_READ_WRITE_TOKEN: vercel_blob_rw_ciplaceholder_0123456789ab
+          PREVIEW_SECRET: test-preview
+          CRON_SECRET: test-cron
+          NEXT_PUBLIC_SERVER_URL: http://localhost:3000
       - name: Run e2e tests
         run: pnpm test:e2e
         env:
