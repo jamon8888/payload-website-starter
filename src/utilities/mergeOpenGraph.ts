@@ -11,22 +11,22 @@ export const defaultDescription = 'An open-source website built with Payload and
 /** Fallback site name, used for Open Graph and JSON-LD publisher. */
 export const defaultSiteName = 'Payload Website Template'
 
-const defaultOpenGraph: Metadata['openGraph'] = {
-  type: 'website',
-  description: defaultDescription,
-  images: [
+export const mergeOpenGraph = (
+  og?: Metadata['openGraph'],
+  siteName: string = defaultSiteName,
+): Metadata['openGraph'] => {
+  const defaultImages = [
     {
       url: `${getServerSideURL()}/website-template-OG.webp`,
     },
-  ],
-  siteName: defaultSiteName,
-  title: defaultSiteName,
-}
+  ]
 
-export const mergeOpenGraph = (og?: Metadata['openGraph']): Metadata['openGraph'] => {
   return {
-    ...defaultOpenGraph,
+    type: 'website',
+    description: defaultDescription,
+    siteName,
+    title: siteName,
     ...og,
-    images: og?.images ? og.images : defaultOpenGraph.images,
+    images: og?.images ? og.images : defaultImages,
   }
 }

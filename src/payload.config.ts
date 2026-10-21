@@ -10,9 +10,10 @@ import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
+import { AccessibilityStatement } from './globals/AccessibilityStatement/config'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
-import { AccessibilityStatement } from './globals/AccessibilityStatement/config'
+import { SiteSettings } from './globals/SiteSettings/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -81,7 +82,7 @@ export default buildConfig({
       token: process.env.BLOB_READ_WRITE_TOKEN || '',
     }),
   ],
-  globals: [Header, Footer, AccessibilityStatement],
+  globals: [Header, Footer, AccessibilityStatement, SiteSettings],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {

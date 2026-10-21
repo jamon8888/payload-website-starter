@@ -3,21 +3,48 @@ import type { Metadata } from 'next'
 import type { Media, Page, Post, Config } from '../payload-types'
 import { Locale, locales } from '@/i18n/config'
 
-import { defaultDescription, defaultSiteName, mergeOpenGraph } from './mergeOpenGraph'
+import { defaultDescription, mergeOpenGraph } from './mergeOpenGraph'
 import { getServerSideURL } from './getURL'
+import { getSiteSettings } from './getSiteSettings'
 
-const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
+const getImageURL = (
+  image?: Media | Config['db']['defaultIDType'] | null,
+  fallback?: Media | Config['db']['defaultIDType'] | null,
+) => {
   const serverUrl = getServerSideURL()
 
   let url = serverUrl + '/website-template-OG.webp'
 
-  if (image && typeof image === 'object' && 'url' in image) {
-    const ogUrl = image.sizes?.og?.url
+  const candidate = image || fallback
 
-    url = ogUrl ? serverUrl + ogUrl : serverUrl + image.url
+  if (candidate && typeof candidate === 'object' && 'url' in candidate) {
+    const ogUrl = candidate.sizes?.og?.url
+
+    url = ogUrl ? serverUrl + ogUrl : serverUrl + candidate.url
   }
 
   return url
+}
+
+/**
+ * Applies the title template of the customizer: `%s` is the page title,
+ * `{site}` the brand name.
+ */
+export const applyTitleTemplate = (
+  template: string,
+  pageTitle: string,
+  siteName: string,
+  localeSuffix = '',
+): string => {
+  if (!template) {
+    return `${pageTitle} | ${siteName}${localeSuffix}`
+  }
+
+  return template
+    .replace('%s', pageTitle)
+    .replace('{site}', `${siteName}${localeSuffix}`)
+    .replace(/\s{2,}/g, ' ')
+    .trim()
 }
 
 /**
@@ -48,7 +75,13 @@ export const generateMeta = async (args: {
 }): Promise<Metadata> => {
   const { doc, locale } = args
 
-  const ogImage = getImageURL(doc?.meta?.image)
+  // The customizer: brand name, default description and social image come
+  // from the `site-settings` global.
+  const settings = await getSiteSettings(locale || 'en')
+  const siteName = settings.brandName
+  const localeSuffix = locale && locale !== 'en' ? ` (${locale})` : ''
+
+  const ogImage = getImageURL(doc?.meta?.image, settings.seo.ogImage)
 
   const collectionPrefix = 'heroImage' in (doc || {}) || 'authors' in (doc || {}) ? '/posts' : ''
   const slug = Array.isArray(doc?.slug) ? doc.slug.join('/') : doc?.slug
@@ -56,11 +89,12 @@ export const generateMeta = async (args: {
   const path = getLocalizedPath({ collectionPrefix, slug, locale })
   const canonicalUrl = `${getServerSideURL()}${path}`
 
-  const title = doc?.meta?.title
-    ? doc?.meta?.title + ` | ${defaultSiteName}${locale ? ` (${locale})` : ''}`
-    : `${defaultSiteName}${locale ? ` (${locale})` : ''}`
+  const pageTitle = doc?.meta?.title
+  const title = pageTitle
+    ? applyTitleTemplate(settings.seo.titleTemplate, pageTitle, siteName, localeSuffix)
+    : `${siteName}${localeSuffix}`
 
-  const description = doc?.meta?.description || defaultDescription
+  const description = doc?.meta?.description || settings.seo.defaultDescription || defaultDescription
 
   // Point every language at this doc so search engines can pair them up.
   const languages: Record<string, string> = {}
@@ -83,18 +117,28 @@ export const generateMeta = async (args: {
       canonical: canonicalUrl,
       languages,
     },
-    openGraph: mergeOpenGraph({
-      description,
-      images: ogImage
-        ? [
-            {
-              url: ogImage,
-            },
-          ]
-        : undefined,
-      title,
-      url: canonicalUrl,
-    }),
+    openGraph: mergeOpenGraph(
+      {
+        description,
+        images: ogImage
+          ? [
+              {
+                url: ogImage,
+              },
+            ]
+          : undefined,
+        title,
+        url: canonicalUrl,
+      },
+      siteName,
+    ),
+    twitter: settings.seo.twitterHandle
+      ? {
+          card: 'summary_large_image',
+          site: settings.seo.twitterHandle,
+          title,
+        }
+      : undefined,
     title,
   }
 }

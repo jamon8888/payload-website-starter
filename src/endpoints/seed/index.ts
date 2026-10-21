@@ -336,6 +336,28 @@ export const seed = async ({
         },
       }),
       payload.updateGlobal({
+        slug: 'site-settings',
+        locale: locale as 'en' | 'de' | 'fr' | 'es',
+        data: translateSeedDoc(
+          {
+            brandName: 'Payload Website',
+            theme: {
+              primaryColor: 'oklch(20.5% 0 0deg)',
+              primaryForeground: 'oklch(98.5% 0 0deg)',
+              radius: 'md' as const,
+              fontFamily: 'geist' as const,
+              defaultTheme: 'system' as const,
+            },
+            seo: {
+              titleTemplate: '%s | {site}',
+              defaultDescription: 'An open-source website built with Payload and Next.js.',
+            },
+          },
+          locale,
+          reportMissing(locale),
+        ),
+      }),
+      payload.updateGlobal({
         slug: 'footer',
         locale: locale as 'en' | 'de' | 'fr' | 'es',
         data: {

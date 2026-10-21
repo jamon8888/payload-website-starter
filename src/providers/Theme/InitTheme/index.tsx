@@ -2,8 +2,13 @@ import Script from 'next/script'
 import React from 'react'
 
 import { defaultTheme, themeLocalStorageKey } from '../ThemeSelector/types'
+import type { ThemeMode } from '@/theme/tokens'
 
-export const InitTheme: React.FC = () => {
+export const InitTheme: React.FC<{ defaultTheme?: ThemeMode }> = ({
+  defaultTheme: defaultThemeOverride,
+}) => {
+  const initialTheme = defaultThemeOverride || defaultTheme
+
   return (
     // eslint-disable-next-line @next/next/no-before-interactive-script-outside-document
     <Script
@@ -26,12 +31,13 @@ export const InitTheme: React.FC = () => {
       return theme === 'light' || theme === 'dark'
     }
 
-    var themeToSet = '${defaultTheme}'
+    var configured = '${initialTheme}'
+    var themeToSet = configured === 'system' || !themeIsValid(configured) ? null : configured
     var preference = window.localStorage.getItem('${themeLocalStorageKey}')
 
     if (themeIsValid(preference)) {
       themeToSet = preference
-    } else {
+    } else if (!themeToSet) {
       var implicitPreference = getImplicitPreference()
 
       if (implicitPreference) {
@@ -39,7 +45,7 @@ export const InitTheme: React.FC = () => {
       }
     }
 
-    document.documentElement.setAttribute('data-theme', themeToSet)
+    document.documentElement.setAttribute('data-theme', themeToSet || 'light')
   })();
   `,
       }}

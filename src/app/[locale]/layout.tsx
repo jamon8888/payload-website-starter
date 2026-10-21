@@ -14,6 +14,8 @@ import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { ThemeApplier } from '@/providers/Theme/ThemeApplier'
 import { SkipLink } from '@/components/a11y'
+import { getSiteSettings } from '@/utilities/getSiteSettings'
+import { themeToCssVariables } from '@/theme/tokens'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { notFound } from 'next/navigation'
 import { draftMode } from 'next/headers'
@@ -46,10 +48,19 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   // Passing the catalog explicitly keeps client components in the right language.
   const messages = (await import(`../../i18n/messages/${locale}.json`)).default
 
+  // The customizer: the theme values are injected as CSS variables, so the
+  // admin can rebrand the site without a rebuild.
+  const siteSettings = await getSiteSettings(locale)
+  const themeVariables = themeToCssVariables(siteSettings.theme)
+
   return (
     <html className={cn(GeistSans.variable, GeistMono.variable)} lang={locale} suppressHydrationWarning>
       <head>
-        <InitTheme />
+        <InitTheme defaultTheme={siteSettings.theme.defaultTheme} />
+        <style
+          dangerouslySetInnerHTML={{ __html: themeVariables }}
+          id="site-theme"
+        />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import React, { useEffect } from 'react'
 
 import type { Header } from '@/payload-types'
+import type { Media } from '@/payload-types'
 import { Locale } from '@/i18n/config'
 
 import { Logo } from '@/components/Logo/Logo'
@@ -13,9 +14,16 @@ import { HeaderNav } from './Nav'
 interface HeaderClientProps {
   data: Header
   locale: Locale
+  brandName: string
+  logo: number | Media | null
 }
 
-export const HeaderClient: React.FC<HeaderClientProps> = ({ data, locale }) => {
+export const HeaderClient: React.FC<HeaderClientProps> = ({
+  brandName,
+  data,
+  locale,
+  logo,
+}) => {
   /* `headerTheme` is read from the DOM on the client only, so the attribute is deferred
      past hydration via suppressHydrationWarning rather than a second render of local state */
   const { headerTheme, setHeaderTheme } = useHeaderTheme()
@@ -26,6 +34,8 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, locale }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
 
+  const customLogo = logo && typeof logo === 'object' ? logo : null
+
   return (
     <header
       className="container relative z-20   "
@@ -34,7 +44,16 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, locale }) => {
     >
       <div className="py-8 flex justify-between">
         <Link href={`/${locale === 'en' ? '' : locale}`}>
-          <Logo loading="eager" priority="high" className="invert dark:invert-0" />
+          {customLogo?.url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              alt={customLogo.alt || brandName}
+              className="h-8 w-auto invert dark:invert-0"
+              src={customLogo.url}
+            />
+          ) : (
+            <Logo loading="eager" priority="high" className="invert dark:invert-0" />
+          )}
         </Link>
         <HeaderNav data={data} locale={locale} />
       </div>

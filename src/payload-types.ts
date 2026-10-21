@@ -116,11 +116,13 @@ export interface Config {
     header: Header;
     footer: Footer;
     'accessibility-statement': AccessibilityStatement1;
+    'site-settings': SiteSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     'accessibility-statement': AccessibilityStatementSelect<false> | AccessibilityStatementSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: 'en' | 'de' | 'fr' | 'es';
   widgets: {
@@ -2246,6 +2248,41 @@ export interface AccessibilityStatement1 {
   createdAt?: string | null;
 }
 /**
+ * Brand, theme and SEO defaults. These values are injected into every page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * Used in the titles, the footer and the social cards.
+   */
+  brandName: string;
+  logo?: (number | null) | Media;
+  theme?: {
+    /**
+     * Any CSS colour: oklch(), hex or rgb(). The dark theme inverts it.
+     */
+    primaryColor?: string | null;
+    primaryForeground?: string | null;
+    radius?: ('none' | 'sm' | 'md' | 'lg') | null;
+    fontFamily?: ('geist' | 'system' | 'serif') | null;
+    defaultTheme?: ('light' | 'dark' | 'system') | null;
+  };
+  seo?: {
+    /**
+     * %s is replaced by the page title, {site} by the brand name.
+     */
+    titleTemplate?: string | null;
+    defaultDescription?: string | null;
+    ogImage?: (number | null) | Media;
+    twitterHandle?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
@@ -2311,6 +2348,34 @@ export interface AccessibilityStatementSelect<T extends boolean = true> {
   contactEmail?: T;
   schemaPluriannuelUrl?: T;
   planActionAnnuelUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  brandName?: T;
+  logo?: T;
+  theme?:
+    | T
+    | {
+        primaryColor?: T;
+        primaryForeground?: T;
+        radius?: T;
+        fontFamily?: T;
+        defaultTheme?: T;
+      };
+  seo?:
+    | T
+    | {
+        titleTemplate?: T;
+        defaultDescription?: T;
+        ogImage?: T;
+        twitterHandle?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

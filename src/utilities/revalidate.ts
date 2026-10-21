@@ -24,9 +24,13 @@ export const localePath = (locale: string, path = ''): string => `/${locale}${pa
  * invalidation is best-effort in that context, so failures are logged instead of
  * thrown: the content is already persisted, only the cache is stale.
  */
-export const safeRevalidatePath = (path: string, logger?: Logger): void => {
+export const safeRevalidatePath = (
+  path: string,
+  logger?: Logger,
+  type?: 'layout' | 'page',
+): void => {
   try {
-    revalidatePath(path)
+    revalidatePath(path, type)
   } catch (error) {
     logger?.warn(`Could not revalidate path "${path}": ${(error as Error).message}`)
   }
