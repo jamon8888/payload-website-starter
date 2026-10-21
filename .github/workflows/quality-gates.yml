@@ -212,9 +212,15 @@ jobs:
       # The a11y tools drive a real browser, so point them at the Chrome that
       # `browser-driver-manager` installs. The axe-core CLI also needs a matching
       # chromedriver — its bundled one tracks Chrome, not whatever is on PATH.
+      #
+      # `browser-driver-manager` only *prints* the paths it sets, it does not
+      # export them to the shell: they have to be read back from its output,
+      # otherwise the tools fall back to a browser that is not installed.
       - name: Install browser
         run: |
-          npx browser-driver-manager install chrome
+          BROWSER_OUTPUT=$(npx browser-driver-manager install chrome)
+          echo "$BROWSER_OUTPUT"
+          eval "$(echo "$BROWSER_OUTPUT" | grep -E '^(CHROME_TEST_PATH|CHROMEDRIVER_TEST_PATH)=' | sed 's/"//g')"
           echo "CHROME_TEST_PATH=$CHROME_TEST_PATH" >> "$GITHUB_ENV"
           echo "CHROMEDRIVER_TEST_PATH=$CHROMEDRIVER_TEST_PATH" >> "$GITHUB_ENV"
           echo "PUPPETEER_EXECUTABLE_PATH=$CHROME_TEST_PATH" >> "$GITHUB_ENV"
