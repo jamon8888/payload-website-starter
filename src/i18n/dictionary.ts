@@ -30,7 +30,9 @@ export async function getDictionary(locale: Locale) {
       goHome: t('notFound.goHome'),
     },
     pageRange: {
-      showing: t('pageRange.showing'),
+      // `showing` takes runtime values ("{start} - {end} of {total} {type}"), so
+      // it cannot be resolved eagerly here — the PageRange component formats it
+      // itself with `t('showing', { start, end, total, type })`.
       noResults: t('pageRange.noResults'),
     },
     hero: {
