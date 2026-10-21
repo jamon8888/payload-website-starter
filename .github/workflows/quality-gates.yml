@@ -179,7 +179,7 @@ jobs:
           POSTGRES_URL: postgresql://postgres:postgres@localhost:5432/payload
       - name: Start dev server in background
         run: |
-          nohup pnpm dev > dev-server.log 2>&1 &
+          nohup node_modules/.bin/next dev > dev-server.log 2>&1 &
           echo $! > dev-server.pid
           for i in {1..90}; do
             if curl -sf http://localhost:3000/en > /dev/null; then

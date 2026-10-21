@@ -37,7 +37,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
+    // The local binary, not `pnpm dev`: pnpm 11 fails with a missing
+    // `.pnpmfile.mjs` when it starts a script in CI, and pnpm cannot run the
+    // pinned version on some machines. `next dev` is what the script does.
+    command: 'node_modules/.bin/next dev',
     reuseExistingServer: true,
     url: 'http://localhost:3000',
   },
