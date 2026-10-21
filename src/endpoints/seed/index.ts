@@ -1,5 +1,6 @@
 import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from 'payload'
 
+import { locales } from '@/i18n/config'
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { home } from './home'
@@ -225,62 +226,77 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding globals...`)
 
-  await Promise.all([
-    payload.updateGlobal({
-      slug: 'header',
-      data: {
-        navItems: [
-          {
-            link: {
-              type: 'custom',
-              label: 'Posts',
-              url: '/posts',
-            },
-          },
-          {
-            link: {
-              type: 'reference',
-              label: 'Contact',
-              reference: {
-                relationTo: 'pages',
-                value: contactPage.id,
+  // The navigation arrays are localized, so every locale needs its own rows.
+  // Without them the other locales fall back to the English entries.
+  const navLabels: Record<string, { posts: string; contact: string }> = {
+    en: { posts: 'Posts', contact: 'Contact' },
+    fr: { posts: 'Articles', contact: 'Contact' },
+    de: { posts: 'Beiträge', contact: 'Kontakt' },
+    es: { posts: 'Artículos', contact: 'Contacto' },
+  }
+
+  for (const locale of locales) {
+    const labels = navLabels[locale] || navLabels.en
+
+    await Promise.all([
+      payload.updateGlobal({
+        slug: 'header',
+        locale: locale as 'en' | 'de' | 'fr' | 'es',
+        data: {
+          navItems: [
+            {
+              link: {
+                type: 'custom',
+                label: labels.posts,
+                url: '/posts',
               },
             },
-          },
-        ],
-      },
-    }),
-    payload.updateGlobal({
-      slug: 'footer',
-      data: {
-        navItems: [
-          {
-            link: {
-              type: 'custom',
-              label: 'Admin',
-              url: '/admin',
+            {
+              link: {
+                type: 'reference',
+                label: labels.contact,
+                reference: {
+                  relationTo: 'pages',
+                  value: contactPage.id,
+                },
+              },
             },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Source Code',
-              newTab: true,
-              url: 'https://github.com/payloadcms/payload/tree/3.x/templates/website',
+          ],
+        },
+      }),
+      payload.updateGlobal({
+        slug: 'footer',
+        locale: locale as 'en' | 'de' | 'fr' | 'es',
+        data: {
+          navItems: [
+            {
+              link: {
+                type: 'custom',
+                label: 'Admin',
+                url: '/admin',
+              },
             },
-          },
-          {
-            link: {
-              type: 'custom',
-              label: 'Payload',
-              newTab: true,
-              url: 'https://payloadcms.com/',
+            {
+              link: {
+                type: 'custom',
+                label: 'Source Code',
+                newTab: true,
+                url: 'https://github.com/payloadcms/payload/tree/3.x/templates/website',
+              },
             },
-          },
-        ],
-      },
-    }),
-  ])
+            {
+              link: {
+                type: 'custom',
+                label: 'Payload',
+                newTab: true,
+                url: 'https://payloadcms.com/',
+              },
+            },
+          ],
+        },
+      }),
+    ])
+  }
 
   payload.logger.info('Seeded database successfully!')
 }
