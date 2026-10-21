@@ -1,6 +1,7 @@
 import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from 'payload'
 
 import { locales } from '@/i18n/config'
+import { translateSeedDoc } from './translate'
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
 import { home } from './home'
@@ -37,6 +38,16 @@ export const seed = async ({
   req: PayloadRequest
 }): Promise<void> => {
   payload.logger.info('Seeding database...')
+
+  // The English content is the reference version; every other locale gets
+  // the same documents with their strings translated.
+  const otherLocales = locales.filter(
+    (locale) => locale !== 'en',
+  ) as Array<'en' | 'de' | 'fr' | 'es'>
+
+  const reportMissing = (locale: string) => (missing: string[]) => {
+    payload.logger.warn(`Missing ${locale} translations: ${missing.join(' | ')}`)
+  }
 
   // we need to clear the media directory before seeding
   // as well as the collections and globals
@@ -178,6 +189,38 @@ export const seed = async ({
     data: post3({ heroImage: image3Doc, blockImage: image1Doc, author: demoAuthor }),
   })
 
+  payload.logger.info(`— Seeding localized posts...`)
+
+  const postBuilders = [
+    {
+      doc: post1Doc,
+      build: () => post1({ heroImage: image1Doc, blockImage: image2Doc, author: demoAuthor }),
+    },
+    {
+      doc: post2Doc,
+      build: () => post2({ heroImage: image2Doc, blockImage: image3Doc, author: demoAuthor }),
+    },
+    {
+      doc: post3Doc,
+      build: () => post3({ heroImage: image3Doc, blockImage: image1Doc, author: demoAuthor }),
+    },
+  ]
+
+  for (const { build, doc } of postBuilders) {
+    for (const locale of otherLocales) {
+      await payload.update({
+        collection: 'posts',
+        id: doc.id,
+        locale,
+        depth: 0,
+        context: {
+          disableRevalidate: true,
+        },
+        data: translateSeedDoc(build(), locale, reportMissing(locale)),
+      })
+    }
+  }
+
   // update each post with related posts
   await payload.update({
     id: post1Doc.id,
@@ -211,7 +254,7 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding pages...`)
 
-  const [_, contactPage] = await Promise.all([
+  const [homeDoc, contactPage] = await Promise.all([
     payload.create({
       collection: 'pages',
       depth: 0,
@@ -223,6 +266,34 @@ export const seed = async ({
       data: contactPageData({ contactForm: contactForm }),
     }),
   ])
+
+  payload.logger.info(`— Seeding localized pages...`)
+
+  for (const locale of otherLocales) {
+    await payload.update({
+      collection: 'pages',
+      id: homeDoc.id,
+      locale,
+      depth: 0,
+      data: translateSeedDoc(
+        home({ heroImage: imageHomeDoc, metaImage: image2Doc }),
+        locale,
+        reportMissing(locale),
+      ),
+    })
+
+    await payload.update({
+      collection: 'pages',
+      id: contactPage.id,
+      locale,
+      depth: 0,
+      data: translateSeedDoc(
+        contactPageData({ contactForm: contactForm }),
+        locale,
+        reportMissing(locale),
+      ),
+    })
+  }
 
   payload.logger.info(`— Seeding globals...`)
 
