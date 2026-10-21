@@ -59,6 +59,27 @@ Les couleurs sont assainies avant injection (`sanitizeColor`).
 - Le seed est **destructif** : il vide les collections, donc l'article RGAA et
   les déclarations d'accessibilité sont à recréer après.
 
+## MCP (serveur Payload pour les agents)
+
+Le plugin `@payloadcms/plugin-mcp` est installé et configuré dans
+`src/mcp/index.ts` (collections, globals, descriptions, override de la
+collection de clés API).
+
+- Endpoint : `POST /api/mcp` (local `http://127.0.0.1:3000/api/mcp`, prod
+  `https://payload-website-starter-snowy-gamma.vercel.app/api/mcp`).
+- Auth : `Authorization: Bearer <clé>`. Les clés vivent dans la collection
+  `payload-mcp-api-keys` (Admin → MCP → API Keys) ; la clé est stockée
+  chiffrée et indexée par HMAC.
+- `.mcp.json` (racine) déclare les serveurs avec
+  `"Authorization": "Bearer ${PAYLOAD_MCP_KEY}"` → il faut que la variable
+  d'environnement soit définie : `export PAYLOAD_MCP_KEY="MCP-…"`.
+- Régénérer une clé : `node --import=tsx/esm scripts/create-mcp-key.ts`
+  (le script affiche `KEY=…` ; les anciennes clés de l'utilisateur sont
+  supprimées).
+- Les outils exposés : `find/create/update/delete` par collection, `find/update`
+  par global, plus les paramètres `locale` / `fallbackLocale` (la
+  localisation est gérée nativement).
+
 ## Pièges
 
 - Les chemins revalidés sont les chemins **internes** (`/en/posts/...`), pas les

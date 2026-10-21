@@ -105,6 +105,10 @@ Locales are `en` (default), `de`, `fr`, `es`, declared in three places that must
 
 Issues live in GitHub Issues, managed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
 
+### MCP server
+
+`@payloadcms/plugin-mcp` is installed (config in `src/mcp/index.ts`). The endpoint is `POST /api/mcp` and expects `Authorization: Bearer <api-key>`; keys live in the `payload-mcp-api-keys` collection (Admin → MCP → API Keys). `.mcp.json` declares the servers with the `${PAYLOAD_MCP_KEY}` placeholder — the variable must be exported in the shell. Regenerate a key with `node --import=tsx/esm scripts/create-mcp-key.ts`. Collection and global tools accept `locale` / `fallbackLocale`.
+
 ### Triage labels
 
 Default five-role vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.

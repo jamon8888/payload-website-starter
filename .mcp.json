@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "Payload": {
+      "type": "http",
+      "url": "http://127.0.0.1:3000/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${PAYLOAD_MCP_KEY}"
+      }
+    },
+    "Payload (production)": {
+      "type": "http",
+      "url": "https://payload-website-starter-snowy-gamma.vercel.app/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${PAYLOAD_MCP_KEY}"
+      }
+    }
+  }
+}
