@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import React from 'react'
-import { Locale, locales, defaultLocale, localeNames } from '@/i18n/config'
+import { LOCALE_COOKIE, Locale, locales, defaultLocale, localeNames } from '@/i18n/config'
 import { useTranslations } from 'next-intl'
 
 export function LanguageSwitcher() {
@@ -27,6 +27,12 @@ export function LanguageSwitcher() {
     // unprefixed, every other locale gets a `/<locale>` prefix.
     const prefix = locale === defaultLocale ? '' : `/${locale}`
     const rest = pathSegments.length ? `/${pathSegments.join('/')}` : ''
+
+    // Remember the choice: the default locale is served from an unprefixed
+    // URL, which the proxy resolves with `Accept-Language`. Without the
+    // cookie, picking "English" from a browser set to French would land back
+    // on the French version.
+    document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=31536000; samesite=lax`
 
     // A full document navigation, not a client-side route change: switching
     // locale also switches the rendered tree (the `[locale]` segment), and the

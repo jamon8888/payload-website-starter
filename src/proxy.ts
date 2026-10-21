@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { locales, defaultLocale } from '@/i18n/config'
+import { LOCALE_COOKIE, locales, defaultLocale, type Locale } from '@/i18n/config'
 
 /**
  * next-intl reads the active locale from this request header on the server.
@@ -40,9 +40,17 @@ export function proxy(request: NextRequest) {
   )
 
   // `Accept-Language` only gets a say when the URL carries no locale at all.
+  // An explicit choice from the language switcher wins over it: it is stored
+  // in a cookie, otherwise choosing "English" from a browser set to French
+  // would land back on the French version (the URL is unprefixed for the
+  // default locale, so it would be negotiated again).
+  const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value
+  const preferredLocale =
+    cookieLocale && locales.includes(cookieLocale as Locale) ? cookieLocale : null
+
   const locale = hasLocale
     ? segment
-    : negotiateLocale(request.headers.get('accept-language'))
+    : (preferredLocale ?? negotiateLocale(request.headers.get('accept-language')))
 
   const headers = new Headers(request.headers)
   headers.set(LOCALE_HEADER, locale)
