@@ -70,7 +70,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   const serverUrl = getServerSideURL()
   const localePrefix = locale === 'en' ? '' : `/${locale}`
   const canonicalUrl = `${serverUrl}${localePrefix}/posts/${decodedSlug}`
-  const t = await getTranslations({ locale, namespace: 'posts' })
+  const t = await getTranslations({ locale, namespace: 'nav' })
 
   const heroImage = post.heroImage
   const imageUrl =
@@ -115,8 +115,7 @@ export default async function Post({ params: paramsPromise }: Args) {
         <Breadcrumb
           className="mb-6"
           items={[
-            { label: t('posts'), href: `${serverUrl}${localePrefix}/posts` },
-            { label: post.title || decodedSlug },
+            { label: t('posts'), href: `${serverUrl}${localePrefix}/posts` },            { label: post.title || decodedSlug },
           ]}
         />
       </div>
