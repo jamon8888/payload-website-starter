@@ -6,7 +6,7 @@
 - `pnpm lint` / `pnpm lint:fix` — ESLint.
 - **There is no `typecheck` script.** Use `pnpm exec tsc --noEmit`. (`pnpm build` also typechecks, but it needs a database.)
 - `pnpm test:int` — Vitest integration tests (`tests/int/**/*.int.spec.ts`).
-- `pnpm test:e2e` — Playwright; it starts `pnpm dev` itself (`reuseExistingServer: true`, so an already-running dev server is reused).
+- `pnpm test:e2e` — Playwright; it starts the dev server itself (`node_modules/.bin/next dev`, `reuseExistingServer: true`, so an already-running dev server is reused).
 - `pnpm test` — runs int, then e2e.
 - `pnpm quality:all` — a11y (axe + pa11y), Lighthouse, JSON-LD schema validation and `llms.txt`. **Needs a running dev server.**
 
@@ -27,6 +27,9 @@ pnpm exec playwright test tests/e2e/frontend.e2e.spec.ts
 - `build` — applies migrations first, then builds.
 - `tests` — integration + e2e against a Postgres 16 service.
 - `frontend-quality` — boots one dev server and runs schema, `llms.txt`, axe, pa11y and Lighthouse against it.
+- The workflow installs pnpm itself (`pnpm/action-setup`, pinned to 11.0.8) **before** `setup-node`: the runners no longer ship pnpm and `setup-node` fails with `cache: 'pnpm'` when it cannot resolve the store path. The jobs run on **Node 22** because pnpm 11 requires Node ≥ 22.13.
+- Chrome cannot start in the CI container with its sandbox enabled: `pa11y.json` and `lighthouserc.json` pass `--no-sandbox`.
+- The e2e job seeds the content (`pnpm seed:local`) before running: the database only holds the migrations at that point.
 
 **The frontend checks must share a single job.** GitHub runners are ephemeral, so a "dev-server" job that a later job `needs:` does not share a machine — `localhost:3000` will not exist there. Do not split these back apart.
 
@@ -39,6 +42,8 @@ The exception is `tests/int/i18n.int.spec.ts`, which only reads the message cata
 `BLOB_READ_WRITE_TOKEN` must match `vercel_blob_rw_<store_id>_<random>` — `@payloadcms/storage-vercel-blob` throws at config-build time on any other shape.
 
 Playwright uses `channel: 'chromium'` — run `pnpm exec playwright install chromium` once.
+
+The axe-core CLI needs a `chromedriver` matching the installed Chrome: `npx browser-driver-manager install chrome` provides both, and its `CHROME_TEST_PATH` / `CHROMEDRIVER_TEST_PATH` outputs have to be read back from its stdout (it only prints them, it does not export them).
 
 ## Generated files
 
