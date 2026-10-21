@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint)",
+      "Bash(npm run test:int:*)",
+      "Bash(npm run dev)",
+      "Bash(npm run generate:types)",
+      "Bash(npm exec tsc:*)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(./node_modules/.bin/payload:*)",
+      "Bash(./node_modules/.bin/next:*)",
+      "Bash(node --import=tsx/esm scripts:*)",
+      "Bash(node --import=tsx/esm scripts/*)",
+      "Bash(vercel deploy:*)",
+      "Bash(vercel ls:*)",
+      "Bash(vercel logs:*)",
+      "Bash(vercel inspect:*)",
+      "Bash(vercel env ls:*)",
+      "Bash(vercel env pull:*)",
+      "Bash(vercel firewall:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push origin main)",
+      "Bash(git show:*)"
+    ],
+    "deny": [
+      "Bash(vercel blob delete-store:*)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)"
+    ]
+  }
+}
