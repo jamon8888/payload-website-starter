@@ -38,7 +38,12 @@ export const safeRevalidatePath = (
 
 export const safeRevalidateTag = (tag: string, logger?: Logger): void => {
   try {
-    revalidateTag(tag, 'max')
+    // `{ expire: 0 }` = blocking revalidation: the next request waits for the
+    // fresh data instead of serving stale content while it regenerates in
+    // the background. The default `revalidateTag(tag)` behaves like this, but
+    // the two-argument form is the current API — and a named profile such as
+    // `'max'` would publicly serve stale content for the whole SWR window.
+    revalidateTag(tag, { expire: 0 })
   } catch (error) {
     logger?.warn(`Could not revalidate tag "${tag}": ${(error as Error).message}`)
   }
