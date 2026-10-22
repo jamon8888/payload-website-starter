@@ -36,6 +36,32 @@ export const safeRevalidatePath = (
   }
 }
 
+/**
+ * Purges a content path in BOTH forms the cache may be keyed by:
+ *
+ * - for the default locale, the canonical public path (`/posts/x`) — the ISR
+ *   cache entry — because the proxy rewrites it to the internal `/en/posts/x`
+ *   and `revalidatePath('/en/...')` silently misses it;
+ * - for the other locales the public path IS the prefixed path.
+ *
+ * The `path` is the locale-less content path ("" for the home page, "/posts/x"
+ * for a post).
+ */
+export const safeRevalidateDocPath = (
+  locale: string,
+  path: string,
+  logger?: Logger,
+): void => {
+  const joined = path.replace(/\/$/, '')
+
+  if (locale === 'en') {
+    safeRevalidatePath(joined || '/', logger)
+    safeRevalidatePath(`/en${joined || ''}`, logger)
+  } else {
+    safeRevalidatePath(`/${locale}${joined}`, logger)
+  }
+}
+
 export const safeRevalidateTag = (tag: string, logger?: Logger): void => {
   try {
     // `{ expire: 0 }` = blocking revalidation: the next request waits for the
