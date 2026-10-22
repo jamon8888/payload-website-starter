@@ -6,7 +6,7 @@ import { Pagination } from '@/components/Pagination'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
-import PageClient from './page.client'
+import { HeaderTheme } from '@/components/HeaderTheme'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '@/i18n/dictionary'
 import { Locale, locales } from '@/i18n/config'
@@ -19,6 +19,7 @@ interface Args {
   }>
 }
 
+export const dynamic = 'force-static'
 export const revalidate = 600
 
 export async function generateStaticParams() {
@@ -69,7 +70,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   return (
     <div className="pt-24 pb-24">
-      <PageClient />
+      <HeaderTheme theme="light" />
       <div className="container mb-16">
         <div className="prose dark:prose-invert max-w-none">
           <h1>{dict.posts.title}</h1>

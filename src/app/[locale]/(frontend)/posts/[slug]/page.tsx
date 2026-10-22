@@ -1,28 +1,22 @@
 import type { Metadata } from 'next'
 
-import { RelatedPosts } from '@/blocks/RelatedPosts/Component'
-import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
-import { draftMode } from 'next/headers'
-import React, { cache } from 'react'
-import RichText from '@/components/RichText'
+import React from 'react'
 
-import type { Post } from '@/payload-types'
-
-import { PostHero } from '@/heros/PostHero'
+import { PayloadRedirects } from '@/components/PayloadRedirects'
+import { PostView } from '@/components/views/PostView'
 import { generateMeta } from '@/utilities/generateMeta'
-import PageClient from './page.client'
-import { LivePreviewListener } from '@/components/LivePreviewListener'
-import { Locale, locales } from '@/i18n/config'
 import { localizedHref } from '@/i18n/path'
-import { AEOSection } from '@/blocks/AEO'
-import { ArticleMarkup, BreadcrumbMarkup } from '@/components/schema'
-import { Breadcrumb } from '@/components/a11y'
-import { AccessibilityNotice } from '@/components/AccessibilityNotice'
-import { getAccessibilityStatementForContent } from '@/utilities/getAccessibilityStatements'
-import { getServerSideURL } from '@/utilities/getURL'
-import { getTranslations } from 'next-intl/server'
+import { locales, type Locale } from '@/i18n/config'
+import { queryPostBySlug } from '@/utilities/queries'
+
+/**
+ * The public article is rendered statically and revalidated on demand — see the
+ * comment on the page route. The draft preview lives in its own dynamic route.
+ */
+export const dynamic = 'force-static'
+export const revalidate = 600
 
 export async function generateStaticParams() {
   // During build, PAYLOAD_SECRET may not be available
@@ -58,126 +52,32 @@ type Args = {
 }
 
 export default async function Post({ params: paramsPromise }: Args) {
-  const { isEnabled: draft } = await draftMode()
   const { locale, slug = '' } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = localizedHref(locale, `posts/${decodedSlug}`)
-  const post = await queryPostBySlug({ slug: decodedSlug, locale: locale as Locale })
+
+  const post = await queryPostBySlug({
+    slug: decodedSlug,
+    locale,
+    draft: false,
+  })
 
   if (!post) return <PayloadRedirects locale={locale} url={url} />
 
-  const serverUrl = getServerSideURL()
-  const localePrefix = locale === 'en' ? '' : `/${locale}`
-  const canonicalUrl = `${serverUrl}${localePrefix}/posts/${decodedSlug}`
-  const t = await getTranslations({ locale, namespace: 'nav' })
-
-  const heroImage = post.heroImage
-  const imageUrl =
-    heroImage && typeof heroImage === 'object'
-      ? `${serverUrl}${heroImage.sizes?.og?.url ?? heroImage.url ?? ''}`
-      : undefined
-
-  const firstAuthor = post.authors?.[0]
-  const firstAuthorUser =
-    firstAuthor && typeof firstAuthor === 'object' && 'user' in firstAuthor
-      ? (firstAuthor.user as { name?: string | null } | null)
-      : null
-
-  const accessibilityStatement = post.id
-    ? await getAccessibilityStatementForContent({
-        contentID: post.id,
-        relationTo: 'posts',
-        locale,
-      })
-    : null
-
-  return (
-    <article className="pt-16 pb-16">
-      <ArticleMarkup
-        headline={post.title || decodedSlug}
-        description={post.aeo?.aeoSummary || undefined}
-        image={imageUrl}
-        datePublished={post.publishedAt || undefined}
-        dateModified={post.updatedAt || undefined}
-        authorName={firstAuthorUser?.name || undefined}
-        url={canonicalUrl}
-      />
-
-      <BreadcrumbMarkup
-        items={[
-          { name: 'Posts', item: `${serverUrl}${localePrefix}/posts` },
-          { name: post.title || decodedSlug, item: canonicalUrl },
-        ]}
-      />
-
-      <div className="container">
-        <Breadcrumb
-          className="mb-6"
-          items={[
-            { label: t('posts'), href: `${serverUrl}${localePrefix}/posts` },            { label: post.title || decodedSlug },
-          ]}
-        />
-      </div>
-
-      <PageClient />
-
-      {/* Allows redirects for valid pages too */}
-      <PayloadRedirects locale={locale} disableNotFound url={url} />
-
-      {draft && <LivePreviewListener />}
-
-      <PostHero post={post} locale={locale} />
-
-      <div className="flex flex-col items-center gap-4 pt-8">
-        <div className="container">
-          <RichText className="max-w-[48rem] mx-auto" data={post.content} enableGutter={false} />
-
-          <AEOSection aeo={post.aeo} />
-
-          <AccessibilityNotice locale={locale} statement={accessibilityStatement} />
-
-          {post.relatedPosts && post.relatedPosts.length > 0 && (
-            <RelatedPosts
-              className="mt-12 max-w-[52rem] lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
-              docs={post.relatedPosts.filter((post) => typeof post === 'object')}
-              locale={locale}
-            />
-          )}
-        </div>
-      </div>
-    </article>
-  )
+  return <PostView locale={locale} post={post} slug={decodedSlug} />
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { locale, slug = '' } = await paramsPromise
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
-  const post = await queryPostBySlug({ slug: decodedSlug, locale: locale as Locale })
+
+  const post = await queryPostBySlug({
+    slug: decodedSlug,
+    locale,
+    draft: false,
+  })
 
   return generateMeta({ doc: post, locale })
 }
-
-const queryPostBySlug = cache(async ({ slug, locale }: { slug: string; locale: string }) => {
-  const { isEnabled: draft } = await draftMode()
-
-  const payload = await getPayload({ config: configPromise })
-
-  const result = await payload.find({
-    collection: 'posts',
-    locale: locale as 'en' | 'de' | 'fr' | 'es' | 'all',
-    fallbackLocale: 'en',
-    draft,
-    limit: 1,
-    overrideAccess: draft,
-    pagination: false,
-    where: {
-      slug: {
-        equals: slug,
-      },
-    },
-  })
-
-  return result.docs?.[0] || null
-})

@@ -10,6 +10,14 @@ import { cn } from '@/utilities/ui'
 import { localizedHref } from '@/i18n/path'
 import Link from 'next/link'
 
+/**
+ * Statically rendered + ISR: these pages only read a centralized global, no
+ * preview is needed here. `force-static` is what overrides the layout's
+ * `draftMode()` call — without it the route stays server-rendered on demand.
+ */
+export const dynamic = 'force-static'
+export const revalidate = 600
+
 interface AccessibilityStatementPageProps {
   params: Promise<{ locale: Locale }>
 }

@@ -4,6 +4,10 @@ import config from '@payload-config'
 import { unstable_cache } from 'next/cache'
 import { Locale, locales } from '@/i18n/config'
 
+// ISR: the sitemap is regenerated when a page is published
+// (revalidatePage hook) or after 10 minutes at most.
+export const revalidate = 600
+
 // Internal function with proper typing
 async function fetchPagesSitemap(locale: Locale): Promise<any> {
   // Narrow the locale type to prevent widening

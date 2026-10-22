@@ -6,7 +6,7 @@ import { Pagination } from '@/components/Pagination'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
-import PageClient from './page.client'
+import { HeaderTheme } from '@/components/HeaderTheme'
 import { getDictionary } from '@/i18n/dictionary'
 import { Locale } from '@/i18n/config'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -41,7 +41,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <div className="pt-24 pb-24">
-      <PageClient />
+      <HeaderTheme theme="light" />
       <div className="container mb-16">
         <div className="prose dark:prose-invert max-w-none">
           <h1>{dict.posts.title}</h1>

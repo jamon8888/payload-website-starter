@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation'
 import { NextRequest } from 'next/server'
 
 import configPromise from '@payload-config'
+import { buildPreviewPath } from '@/utilities/previewPaths'
 
 export type PreviewSearchParams = {
   path: string
@@ -59,5 +60,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 
   draft.enable()
 
-  redirect(safePath)
+  // The public routes are statically rendered: the preview has its own
+  // (dynamic) route, otherwise the draft could never be shown.
+  redirect(buildPreviewPath(safePath))
 }

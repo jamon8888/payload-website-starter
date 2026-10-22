@@ -4,6 +4,10 @@ import config from '@payload-config'
 import { unstable_cache } from 'next/cache'
 import { Locale, locales } from '@/i18n/config'
 
+// ISR: the sitemap is regenerated when a post is published
+// (revalidatePost hook) or after 10 minutes at most.
+export const revalidate = 600
+
 async function fetchPostsSitemap(locale: Locale): Promise<any> {
   const localeConst = locale satisfies Locale
   

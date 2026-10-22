@@ -17,6 +17,12 @@ interface StatementPageProps {
   params: Promise<{ locale: Locale; slug: string }>
 }
 
+/**
+ * Statically rendered + ISR — see `../page.tsx` for the rationale.
+ */
+export const dynamic = 'force-static'
+export const revalidate = 600
+
 const statusLabel = (status: string | null | undefined, a: Record<string, string>) => {
   if (status === 'conformant') return a.fullyCompliant
   if (status === 'nonConformant') return a.nonCompliant

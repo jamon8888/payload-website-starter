@@ -68,7 +68,9 @@ Plain `yes ''` does not work — the prompts need `\r`, not `\n`.
 One Next.js 16 app hosting both halves, split by route group:
 
 - `src/app/(payload)` — admin panel and API routes. Intentionally **outside** the locale segment.
-- `src/app/[locale]/(frontend)` — the public site (home, pages, posts, search, 404, accessibility statement).
+- `src/app/[locale]/(frontend)` — the public site (home, pages, posts, search, 404, accessibility statement). All content routes are statically rendered with ISR (`force-static` + `revalidate = 600`), except `search` (reads `searchParams`) and the sitemap routes (data cached via `unstable_cache`).
+- `src/app/[locale]/(preview)/preview/[[...slug]]` — the **draft preview**, the only dynamic content route. The public routes must never call `draftMode()` (a dynamic API opts them out of static rendering), so `/next/preview` enables draft mode and redirects to `/preview/...` (or `/<locale>/preview/...`), which renders the draft via the shared `PageView`/`PostView` components in `src/components/views/`. `/next/exit-preview` strips `/preview` and returns to the public URL.
+- The home route re-exports `./[slug]/page` from `(frontend)/page.tsx` — Next.js only honours the segment config declared **in that file**, so `force-static` must be repeated there (and in every entry route that is a re-export).
 - `src/app/[locale]/(sitemaps)` — locale-scoped `pages-sitemap.xml` / `posts-sitemap.xml` route handlers.
 - `src/app/llms.txt`, `src/app/robots.txt` — unlocalized root routes, AI-crawler oriented.
 - `src/i18n` — locale list, next-intl request config, typed `getDictionary`, and one `messages/<locale>.json` per locale.
