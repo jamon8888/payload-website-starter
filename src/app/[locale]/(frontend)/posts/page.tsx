@@ -3,13 +3,12 @@ import type { Metadata } from 'next'
 import { CollectionArchive } from '@/components/CollectionArchive'
 import { PageRange } from '@/components/PageRange'
 import { Pagination } from '@/components/Pagination'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import React from 'react'
 import { HeaderTheme } from '@/components/HeaderTheme'
 import { getDictionary } from '@/i18n/dictionary'
 import { Locale } from '@/i18n/config'
 import { getServerSideURL } from '@/utilities/getURL'
+import { queryPostsArchive } from '@/utilities/queries'
 
 interface PageProps {
   params: Promise<{ locale: Locale }>
@@ -22,22 +21,8 @@ export default async function Page({ params }: PageProps) {
   const { locale: localeParam } = await params
   const locale = localeParam satisfies Locale
   const dict = await getDictionary(locale)
-  const payload = await getPayload({ config: configPromise })
 
-  const posts = await payload.find({
-    collection: 'posts',
-    locale: locale as 'en' | 'de' | 'fr' | 'es' | 'all',
-    fallbackLocale: 'en',
-    depth: 1,
-    limit: 12,
-    overrideAccess: false,
-    select: {
-      title: true,
-      slug: true,
-      categories: true,
-      meta: true,
-    },
-  })
+  const posts = await queryPostsArchive({ locale })
 
   return (
     <div className="pt-24 pb-24">

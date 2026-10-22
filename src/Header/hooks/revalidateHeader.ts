@@ -4,15 +4,14 @@ import { safeRevalidatePath, safeRevalidateTag } from '../../utilities/revalidat
 
 /**
  * The header is rendered in the layout, so it is part of the cached HTML of
- * every page: purging its data cache is not enough, the pages themselves have
- * to be regenerated. `revalidatePath('/', 'layout')` drops the whole tree
- * (every locale).
+ * every page: its data cache is tagged per locale
+ * (`global_header_<locale>`), so all locales are purged. The layout purge
+ * regenerates the pages themselves (among them the canonical, unrewritten
+ * URLs of the default locale, which `revalidatePath('/en/...')` cannot reach).
  */
-export const revalidateHeader: GlobalAfterChangeHook = ({
-  req: { payload, locale },
-}) => {
-  const currentLocale = locale || 'en'
-
-  safeRevalidateTag(`global_header_${currentLocale}`, payload.logger)
+export const revalidateHeader: GlobalAfterChangeHook = ({ req: { payload } }) => {
+  for (const locale of ['en', 'de', 'fr', 'es']) {
+    safeRevalidateTag(`global_header_${locale}`, payload.logger)
+  }
   safeRevalidatePath('/', payload.logger, 'layout')
 }

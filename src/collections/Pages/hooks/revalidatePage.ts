@@ -16,6 +16,8 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 
       payload.logger.info(`Revalidating page at path: ${path}`)
 
+      safeRevalidateTag('pages', payload.logger)
+      // URL-based purge kept as best effort; tags are the reliable path (see revalidatePost).
       safeRevalidatePath(path, payload.logger)
       safeRevalidateTag(`pages-sitemap_${currentLocale}`, payload.logger)
     }
@@ -29,6 +31,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 
       payload.logger.info(`Revalidating old page at path: ${oldPath}`)
 
+      safeRevalidateTag('pages', payload.logger)
       safeRevalidatePath(oldPath, payload.logger)
       safeRevalidateTag(`pages-sitemap_${currentLocale}`, payload.logger)
     }
@@ -40,6 +43,7 @@ export const revalidateDelete: CollectionAfterDeleteHook<Page> = ({ doc, req: { 
   if (!context.disableRevalidate) {
     const currentLocale = locale || 'en'
     const path = doc?.slug === 'home' ? localePath(currentLocale) : localePath(currentLocale, `/${doc?.slug}`)
+    safeRevalidateTag('pages')
     safeRevalidatePath(path)
     safeRevalidateTag(`pages-sitemap_${currentLocale}`)
   }

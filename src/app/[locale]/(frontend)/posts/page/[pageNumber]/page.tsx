@@ -3,14 +3,16 @@ import type { Metadata } from 'next'
 import { CollectionArchive } from '@/components/CollectionArchive'
 import { PageRange } from '@/components/PageRange'
 import { Pagination } from '@/components/Pagination'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import React from 'react'
 import { HeaderTheme } from '@/components/HeaderTheme'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '@/i18n/dictionary'
 import { Locale, locales } from '@/i18n/config'
 import { getServerSideURL } from '@/utilities/getURL'
+import { queryPostsArchive } from '@/utilities/queries'
+
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
 
 interface Args {
   params: Promise<{
@@ -52,21 +54,12 @@ export default async function Page({ params: paramsPromise }: Args) {
   const { locale: localeParam, pageNumber } = await paramsPromise
   const locale = localeParam satisfies Locale
   const dict = await getDictionary(locale)
-  const payload = await getPayload({ config: configPromise })
 
   const sanitizedPageNumber = Number(pageNumber)
 
   if (!Number.isInteger(sanitizedPageNumber)) notFound()
 
-  const posts = await payload.find({
-    collection: 'posts',
-    locale: locale as 'en' | 'de' | 'fr' | 'es' | 'all',
-    fallbackLocale: 'en',
-    depth: 1,
-    limit: 12,
-    page: sanitizedPageNumber,
-    overrideAccess: false,
-  })
+  const posts = await queryPostsArchive({ locale, pageNumber: sanitizedPageNumber })
 
   return (
     <div className="pt-24 pb-24">

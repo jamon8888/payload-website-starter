@@ -1,7 +1,12 @@
 import type { GlobalConfig } from 'payload'
 
+import { revalidateAccessibilityStatement } from './hooks/revalidateAccessibilityStatement'
+
 export const AccessibilityStatement: GlobalConfig = {
   slug: 'accessibility-statement',
+  hooks: {
+    afterChange: [revalidateAccessibilityStatement],
+  },
   label: {
     en: 'Accessibility Statement',
     de: 'Erklärung zur Barrierefreiheit',

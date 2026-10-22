@@ -30,6 +30,9 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
 
       payload.logger.info(`Revalidating post at path: ${path}`)
 
+      safeRevalidateTag('posts', payload.logger)
+      safeRevalidateTag('posts-archive', payload.logger)
+      // URL-based purge kept as best effort; tags are the reliable path (rewrites).
       safeRevalidatePath(path, payload.logger)
       safeRevalidateTag(`posts-sitemap_${currentLocale}`, payload.logger)
       revalidateArchives(payload.logger)
@@ -41,6 +44,8 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
 
       payload.logger.info(`Revalidating old post at path: ${oldPath}`)
 
+      safeRevalidateTag('posts', payload.logger)
+      safeRevalidateTag('posts-archive', payload.logger)
       safeRevalidatePath(oldPath, payload.logger)
       safeRevalidateTag(`posts-sitemap_${currentLocale}`, payload.logger)
       revalidateArchives(payload.logger)
@@ -57,6 +62,8 @@ export const revalidateDelete: CollectionAfterDeleteHook<Post> = ({
     const currentLocale = locale || 'en'
     const path = localePath(currentLocale, `/posts/${doc?.slug}`)
 
+    safeRevalidateTag('posts', payload.logger)
+    safeRevalidateTag('posts-archive', payload.logger)
     safeRevalidatePath(path, payload.logger)
     safeRevalidateTag(`posts-sitemap_${currentLocale}`, payload.logger)
     revalidateArchives(payload.logger)

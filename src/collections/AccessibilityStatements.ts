@@ -4,6 +4,11 @@ import { authenticated } from '../access/authenticated'
 import { anyone } from '../access/anyone'
 import { slugField } from 'payload'
 
+import {
+  revalidateStatementDelete,
+  revalidateStatements,
+} from './AccessibilityStatements/hooks/revalidateStatements'
+
 /**
  * RGAA 13.3 requires an accessibility statement for every content. The site
  * level statement lives in the `accessibility-statement` global; this
@@ -12,6 +17,10 @@ import { slugField } from 'payload'
  */
 export const AccessibilityStatements: CollectionConfig<'accessibility-statements'> = {
   slug: 'accessibility-statements',
+  hooks: {
+    afterChange: [revalidateStatements],
+    afterDelete: [revalidateStatementDelete],
+  },
   labels: {
     singular: {
       en: 'Accessibility statement',

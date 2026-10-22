@@ -3,6 +3,7 @@ import { Locale } from '@/i18n/config'
 
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import { unstable_cache } from 'next/cache'
 import React from 'react'
 import RichText from '@/components/RichText'
 
@@ -21,31 +22,40 @@ export const ArchiveBlock: React.FC<
   let posts: Post[] = []
 
   if (populateBy === 'collection') {
-    const payload = await getPayload({ config: configPromise })
-
     const flattenedCategories = categories?.map((category) => {
       if (typeof category === 'object') return category.id
       else return category
     })
 
-    const fetchedPosts = await payload.find({
-      collection: 'posts',
-      locale: locale as 'en' | 'de' | 'fr' | 'es' | 'all',
-      fallbackLocale: 'en',
-      depth: 1,
-      limit,
-      ...(flattenedCategories && flattenedCategories.length > 0
-        ? {
-            where: {
-              categories: {
-                in: flattenedCategories,
-              },
-            },
-          }
-        : {}),
-    })
+    // Tagged `posts-archive` and purged by the post hooks: the cache key
+    // embeds the categories so each block instance has its own entry.
+    const getCachedPosts = unstable_cache(
+      async (limit: number, categoriesJson: string) => {
+        const payload = await getPayload({ config: configPromise })
 
-    posts = fetchedPosts.docs
+        return payload.find({
+          collection: 'posts',
+          locale: locale as 'en' | 'de' | 'fr' | 'es' | 'all',
+          fallbackLocale: 'en',
+          draft: false,
+          depth: 1,
+          limit,
+          ...(categoriesJson
+            ? {
+                where: {
+                  categories: {
+                    in: JSON.parse(categoriesJson),
+                  },
+                },
+              }
+            : {}),
+        })
+      },
+      ['archive-block', locale, String(id ?? '')],
+      { tags: ['posts-archive'] },
+    )
+
+    posts = (await getCachedPosts(limit, JSON.stringify(flattenedCategories ?? []))).docs
   } else {
     if (selectedDocs?.length) {
       const filteredSelectedPosts = selectedDocs.map((post) => {
