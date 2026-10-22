@@ -1,22 +1,28 @@
 import type { GlobalAfterChangeHook } from 'payload'
 
-import { safeRevalidatePath, safeRevalidateTag } from '../../../utilities/revalidate'
+import {
+  docRevalidationPaths,
+  revalidateViaEndpoint,
+  safeRevalidatePath,
+  safeRevalidateTag } from '../../../utilities/revalidate'
 
 /**
- * The site-wide accessibility statement feeds `/accessibilite` (read through a
- * per-locale-tagged data cache) — all locales are purged. The per-content
- * statements live in the `accessibility-statements` collection and only read
- * the statement caches indirectly, purging theirs too is cheap and correct.
+ * The site-wide accessibility statement feeds `/accessibilite` — purged
+ * through the per-locale data cache tags (all locales) and the statement
+ * pages themselves, directly and via the in-scope endpoint (see
+ * revalidateSiteSettings).
  */
-export const revalidateAccessibilityStatement: GlobalAfterChangeHook = ({
+export const revalidateAccessibilityStatement: GlobalAfterChangeHook = async ({
   req: { payload },
 }) => {
-  for (const locale of ['en', 'de', 'fr', 'es']) {
-    safeRevalidateTag(`global_accessibility-statement_${locale}`, payload.logger)
-  }
-  safeRevalidateTag('accessibility-statements', payload.logger)
-  for (const locale of ['en', 'de', 'fr', 'es']) {
-    safeRevalidatePath(`/${locale}/accessibilite`, payload.logger)
-  }
-  safeRevalidatePath('/accessibilite', payload.logger)
+  const locales = ['en', 'de', 'fr', 'es']
+  const tags = locales.map((locale) => `global_accessibility-statement_${locale}`)
+  tags.push('accessibility-statements')
+
+  const paths = locales.flatMap((locale) => docRevalidationPaths(locale, '/accessibilite'))
+
+  tags.forEach((tag) => safeRevalidateTag(tag, payload.logger))
+  safeRevalidatePath('/accessibilite')
+
+  await revalidateViaEndpoint({ paths, tags }, payload.logger)
 }

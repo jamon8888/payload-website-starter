@@ -1,17 +1,21 @@
 import type { GlobalAfterChangeHook } from 'payload'
 
-import { safeRevalidatePath, safeRevalidateTag } from '../../utilities/revalidate'
+import { revalidateViaEndpoint, safeRevalidatePath, safeRevalidateTag } from '../../utilities/revalidate'
 
 /**
  * The header is rendered in the layout, so it is part of the cached HTML of
- * every page: its data cache is tagged per locale
- * (`global_header_<locale>`), so all locales are purged. The layout purge
- * regenerates the pages themselves (among them the canonical, unrewritten
- * URLs of the default locale, which `revalidatePath('/en/...')` cannot reach).
+ * every page. Purged through the per-locale data cache tags AND the whole
+ * layout tree, both directly and via the in-scope `/api/revalidate` endpoint
+ * (see revalidateSiteSettings).
  */
-export const revalidateHeader: GlobalAfterChangeHook = ({ req: { payload } }) => {
-  for (const locale of ['en', 'de', 'fr', 'es']) {
-    safeRevalidateTag(`global_header_${locale}`, payload.logger)
-  }
-  safeRevalidatePath('/', payload.logger, 'layout')
+export const revalidateHeader: GlobalAfterChangeHook = async ({ req: { payload } }) => {
+  const tags = ['en', 'de', 'fr', 'es'].map((locale) => `global_header_${locale}`)
+
+  tags.forEach((tag) => safeRevalidateTag(tag, payload.logger))
+  safeRevalidatePath('/')
+
+  await revalidateViaEndpoint(
+    { layoutPaths: ['/'], tags },
+    payload.logger,
+  )
 }

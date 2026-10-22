@@ -1,28 +1,45 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 
-import { safeRevalidatePath, safeRevalidateTag } from '../../../utilities/revalidate'
+import {
+  docRevalidationPaths,
+  revalidateViaEndpoint,
+  safeRevalidatePath,
+  safeRevalidateTag,
+} from '../../../utilities/revalidate'
 
 /**
- * Per-content accessibility statements: the list powering the registry on
- * `/accessibilite` and every content notice is read through a data cache
- * tagged `accessibility-statements`. Tags are purged on top of the URL purge
- * because the default locale's canonical URLs are rewritten by the proxy and
- * `revalidatePath('/en/...')` cannot reach them.
+ * Per-content accessibility statements — see the global hook. The list and
+ * every content notice are read through a data cache tagged
+ * `accessibility-statements`.
  */
-export const revalidateStatements: CollectionAfterChangeHook = ({ req: { payload, context } }) => {
-  if (context.disableRevalidate) return
+const purge = async ({
+  logger,
+}: {
+  logger: { warn: (message: string) => void }
+}): Promise<void> => {
+  const paths = ['en', 'de', 'fr', 'es'].flatMap((locale) =>
+    docRevalidationPaths(locale, '/accessibilite'),
+  )
 
-  safeRevalidateTag('accessibility-statements', payload.logger)
-  for (const locale of ['en', 'de', 'fr', 'es']) {
-    safeRevalidatePath(`/${locale}/accessibilite`, payload.logger)
+  for (const path of paths) {
+    safeRevalidatePath(path)
   }
-  safeRevalidatePath('/accessibilite', payload.logger)
+
+  safeRevalidateTag('accessibility-statements')
+
+  await revalidateViaEndpoint({ paths, tags: ['accessibility-statements'] }, logger)
 }
 
-export const revalidateStatementDelete: CollectionAfterDeleteHook = ({ req: { payload } }) => {
-  safeRevalidateTag('accessibility-statements', payload.logger)
-  for (const locale of ['en', 'de', 'fr', 'es']) {
-    safeRevalidatePath(`/${locale}/accessibilite`, payload.logger)
+export const revalidateStatements: CollectionAfterChangeHook = async ({
+  req: { payload, context },
+}) => {
+  if (!context.disableRevalidate) {
+    await purge({ logger: payload.logger })
   }
-  safeRevalidatePath('/accessibilite', payload.logger)
+}
+
+export const revalidateStatementDelete: CollectionAfterDeleteHook = async ({
+  req: { payload },
+}) => {
+  await purge({ logger: payload.logger })
 }

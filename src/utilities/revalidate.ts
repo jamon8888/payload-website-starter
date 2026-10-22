@@ -4,6 +4,12 @@ type Logger = {
   warn: (message: string) => void
 }
 
+const internalBaseUrl = (): string =>
+  process.env.NEXT_PUBLIC_SERVER_URL ||
+  process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+  process.env.NEXT_PUBLIC_VERCEL_URL ||
+  ''
+
 /**
  * Every frontend route lives under `src/app/[locale]/`, so the *internal* path
  * always carries the locale segment — English is served from the unprefixed
@@ -47,18 +53,23 @@ export const safeRevalidatePath = (
  * The `path` is the locale-less content path ("" for the home page, "/posts/x"
  * for a post).
  */
+export const docRevalidationPaths = (locale: string, path: string): string[] => {
+  const joined = path.replace(/\/$/, '')
+
+  if (locale === 'en') {
+    return [joined || '/', `/en${joined || ''}`]
+  }
+
+  return [`/${locale}${joined}`]
+}
+
 export const safeRevalidateDocPath = (
   locale: string,
   path: string,
   logger?: Logger,
 ): void => {
-  const joined = path.replace(/\/$/, '')
-
-  if (locale === 'en') {
-    safeRevalidatePath(joined || '/', logger)
-    safeRevalidatePath(`/en${joined || ''}`, logger)
-  } else {
-    safeRevalidatePath(`/${locale}${joined}`, logger)
+  for (const candidate of docRevalidationPaths(locale, path)) {
+    safeRevalidatePath(candidate, logger)
   }
 }
 
@@ -72,5 +83,53 @@ export const safeRevalidateTag = (tag: string, logger?: Logger): void => {
     revalidateTag(tag, { expire: 0 })
   } catch (error) {
     logger?.warn(`Could not revalidate tag "${tag}": ${(error as Error).message}`)
+  }
+}
+
+/**
+ * Queue-shaped invalidation for outside-Next contexts.
+ *
+ * The Payload hooks run the write outside of Next.js' request scope, where
+ * `revalidatePath`/`revalidateTag` are silently inert: the ISR cache entry is
+ * never invalidated (a purge inside a hook "succeeds", yet the page keeps
+ * serving its stale, cached copy). The direct calls are kept as best effort,
+ * and the invalidation ALSO goes through the in-scope `/api/revalidate`
+ * endpoint, where it is actually applied (the "content webhook →
+ * revalidateTag" pattern from the Next.js caching guide).
+ */
+export const revalidateViaEndpoint = async (
+  {
+    paths = [],
+    tags = [],
+    layoutPaths = [],
+  }: { paths?: string[]; tags?: string[]; layoutPaths?: string[] },
+  logger?: Logger,
+): Promise<void> => {
+  const base = internalBaseUrl()
+  const secret = process.env.PREVIEW_SECRET
+
+  if (!base || !secret) {
+    // Self-hosted / offline contexts: no endpoint to call, the direct calls
+    // above are the only mechanism (and they work inside a request scope).
+    return
+  }
+
+  const url = `${base.replace(/\/$/, '')}/api/revalidate?secret=${encodeURIComponent(secret)}`
+
+  try {
+    const started = Date.now()
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tags, paths, layoutPaths }),
+    })
+    if (!res.ok) {
+      const body = await res.text().catch(() => '')
+      logger?.warn(
+        `The revalidate endpoint returned ${res.status} (${Date.now() - started}ms): ${body.slice(0, 300)}`,
+      )
+    }
+  } catch (error) {
+    logger?.warn(`Could not reach the revalidate endpoint: ${(error as Error).message}`)
   }
 }
