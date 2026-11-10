@@ -1,5 +1,13 @@
 # Payload Website Template
 
+## SEO Boost plugin
+
+This repository includes the standalone, migration-free
+[`payload-plugin-seo-boost`](./packages/payload-plugin-seo-boost/README.md)
+package. It can be packed and installed in another compatible Payload 3 site;
+it never connects to or changes a database when installed. The receiving
+project generates, reviews and applies its own migration.
+
 This is the official [Payload Website Template](https://github.com/payloadcms/payload/blob/3.x/templates/website). Use it to power websites, blogs, or portfolios from small to enterprise. This repo includes a fully-working backend, enterprise-grade admin panel, and a beautifully designed, production-ready website.
 
 You can deploy to Vercel, using Neon and Vercel Blob Storage with one click:
