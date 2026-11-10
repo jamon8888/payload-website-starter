@@ -1,13 +1,18 @@
-import type { CollectionConfig, Config, Endpoint, Field, Plugin } from 'payload'
+import type { CollectionConfig, Config, Endpoint, Field, GlobalConfig, Plugin } from 'payload'
+import { NIM_DEFAULT_BASE_URL, NIM_DEFAULT_MODEL, suggestSeoBoost, type NimSettings } from './nim'
+import type { SchemaSource } from './schema'
 
 export { buildSchemaRecommendation } from './schema'
 export type { AnswerBlock, SchemaRecommendation, SchemaSource } from './schema'
+export { NIM_DEFAULT_MODEL, parseSeoBoostSuggestion, suggestSeoBoost } from './nim'
+export type { NimSettings, SeoBoostSuggestion } from './nim'
 
 export type SeoBoostPluginOptions = {
   /** Payload collection slugs that receive the SEO Boost editor tab. */
   collections: string[]
   /** Disable this when the host uses a custom API route or dashboard layout. */
   dashboard?: boolean
+  nim?: Pick<NimSettings, 'baseURL' | 'model'>
 }
 
 type AuditableDocument = {
@@ -17,6 +22,7 @@ type AuditableDocument = {
 }
 
 const authenticated = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
+const settingsSlug = 'seo-boost-settings'
 
 const seoBoostFields: Field[] = [
   { name: 'focusKeyword', type: 'text', label: 'Focus keyword' },
@@ -128,6 +134,24 @@ const monitoringCollections = (relationTo: string[]): CollectionConfig[] => [
   },
 ]
 
+const settingsGlobal = (defaults: SeoBoostPluginOptions['nim']): GlobalConfig => ({ slug: settingsSlug, label: 'SEO Boost settings', access: { read: authenticated, update: authenticated }, fields: [
+  { name: 'nimAPIKey', type: 'text', label: 'NVIDIA NIM API key', admin: { autoComplete: 'off', components: { Field: 'payload-plugin-seo-boost/admin#NimAPIKeyField' }, description: 'Stockée dans Payload et utilisée uniquement par le serveur.' } },
+  { name: 'nimModel', type: 'text', label: 'NVIDIA model', defaultValue: defaults?.model || NIM_DEFAULT_MODEL },
+  { name: 'nimBaseURL', type: 'text', label: 'NVIDIA API URL', defaultValue: defaults?.baseURL || NIM_DEFAULT_BASE_URL },
+] })
+const sourceFromRequest = (value: unknown): SchemaSource => {
+  const input = value && typeof value === 'object' ? value as Record<string, unknown> : {}
+  return { answerBlocks: input.answerBlocks, canonicalURL: cleanString(input.canonicalURL), description: cleanString(input.description), image: input.image, locale: cleanString(input.locale), publishedAt: cleanString(input.publishedAt), schemaType: cleanString(input.schemaType), slug: cleanString(input.slug), title: cleanString(input.title) }
+}
+const cleanString = (value: unknown) => typeof value === 'string' ? value : null
+const suggestionEndpoint = (): Endpoint => ({ path: '/seo-boost/suggest', method: 'post', handler: async (req) => {
+  if (!req.user) return Response.json({ message: 'Authentication required.' }, { status: 401 })
+  let body: { document?: unknown } | null = null
+  try { body = await req.json?.() as { document?: unknown } } catch { return Response.json({ message: 'Corps de requête JSON invalide.' }, { status: 400 }) }
+  const settings = await req.payload.findGlobal({ slug: settingsSlug as never, overrideAccess: true, req }) as NimSettings & { nimAPIKey?: string | null; nimBaseURL?: string | null; nimModel?: string | null }
+  try { return Response.json({ suggestion: await suggestSeoBoost({ apiKey: settings.nimAPIKey || process.env.NVIDIA_API_KEY, baseURL: settings.nimBaseURL, model: settings.nimModel, source: sourceFromRequest(body?.document) }) }) } catch (error) { return Response.json({ message: error instanceof Error ? error.message : 'La suggestion IA a échoué.' }, { status: 502 }) }
+} })
+
 const score = (document: AuditableDocument): number => {
   const title = document.meta?.title?.trim() || document.title?.trim() || ''
   const description = document.meta?.description?.trim() || ''
@@ -190,6 +214,7 @@ export const seoBoostPlugin = (options: SeoBoostPluginOptions): Plugin => (confi
   for (const slug of ['seo-metrics', 'ai-citations']) {
     if (available.has(slug)) throw new Error(`seoBoostPlugin cannot add collection "${slug}" because it already exists.`)
   }
+  if ((config.globals || []).some((global) => global.slug === settingsSlug)) throw new Error(`seoBoostPlugin cannot add global "${settingsSlug}" because it already exists.`)
 
   return {
     ...config,
@@ -199,7 +224,8 @@ export const seoBoostPlugin = (options: SeoBoostPluginOptions): Plugin => (confi
       ),
       ...monitoringCollections(options.collections),
     ],
-    endpoints: [...(config.endpoints || []), dashboardEndpoint(options.collections)],
+    endpoints: [...(config.endpoints || []), dashboardEndpoint(options.collections), suggestionEndpoint()],
+    globals: [...(config.globals || []), settingsGlobal(options.nim)],
     admin:
       options.dashboard === false
         ? config.admin
