@@ -1,5 +1,5 @@
 import type { CollectionConfig, Config, Endpoint, Field, GlobalConfig, Plugin } from 'payload'
-import { NIM_DEFAULT_BASE_URL, NIM_DEFAULT_MODEL, suggestSeoBoost, type NimSettings } from './nim'
+import { NIM_DEFAULT_BASE_URL, NIM_DEFAULT_MODEL, suggestSeoBoost, type NimSettings, type SeoBoostSuggestion } from './nim'
 import type { SchemaSource } from './schema'
 
 export { buildSchemaRecommendation } from './schema'
@@ -58,6 +58,7 @@ const seoBoostFields: Field[] = [
         defaultValue: 'WebPage',
         options: ['WebPage', 'Article', 'Organization', 'LocalBusiness', 'Product', 'Service', 'FAQPage', 'Event'],
       },
+      { name: 'schemaTypes', type: 'select', label: 'Schema types in graph', hasMany: true, options: ['WebPage', 'Article', 'Organization', 'LocalBusiness', 'Product', 'Service', 'FAQPage', 'Event'] },
       { name: 'schemaJSON', type: 'json', label: 'JSON-LD (review before publishing)' },
       { name: 'schemaGenerator', type: 'ui', admin: { components: { Field: 'payload-plugin-seo-boost/admin#SeoBoostSchemaGenerator' } } },
     ],
@@ -119,7 +120,7 @@ const monitoringCollections = (relationTo: string[]): CollectionConfig[] => [
         required: true,
         options: ['chatgpt', 'perplexity', 'google-ai-overviews', 'copilot', 'other'],
       },
-      { name: 'query', type: 'text', required: true },
+      { name: 'query', type: 'text', required: true }, { name: 'rationale', type: 'textarea', label: 'AI rationale' },
       { name: 'citedURL', type: 'text' },
       { name: 'evidenceURL', type: 'text' },
       { name: 'observedAt', type: 'date', required: true },
@@ -128,7 +129,7 @@ const monitoringCollections = (relationTo: string[]): CollectionConfig[] => [
         type: 'select',
         required: true,
         defaultValue: 'confirmed',
-        options: ['confirmed', 'suspected', 'lost'],
+        options: ['suggested', 'confirmed', 'suspected', 'lost'],
       },
     ],
   },
@@ -150,6 +151,13 @@ const suggestionEndpoint = (): Endpoint => ({ path: '/seo-boost/suggest', method
   try { body = await req.json?.() as { document?: unknown } } catch { return Response.json({ message: 'Corps de requête JSON invalide.' }, { status: 400 }) }
   const settings = await req.payload.findGlobal({ slug: settingsSlug as never, overrideAccess: true, req }) as NimSettings & { nimAPIKey?: string | null; nimBaseURL?: string | null; nimModel?: string | null }
   try { return Response.json({ suggestion: await suggestSeoBoost({ apiKey: settings.nimAPIKey || process.env.NVIDIA_API_KEY, baseURL: settings.nimBaseURL, model: settings.nimModel, source: sourceFromRequest(body?.document) }) }) } catch (error) { return Response.json({ message: error instanceof Error ? error.message : 'La suggestion IA a échoué.' }, { status: 502 }) }
+} })
+const citationEndpoint = (collections: string[]): Endpoint => ({ path: '/seo-boost/citations', method: 'post', handler: async (req) => {
+  if (!req.user) return Response.json({ message: 'Authentication required.' }, { status: 401 })
+  const body = await req.json?.() as { collection?: string; contentID?: string | number; suggestions?: SeoBoostSuggestion['citationSuggestions'] } | undefined
+  if (!body?.collection || !collections.includes(body.collection) || !body.contentID || !Array.isArray(body.suggestions)) return Response.json({ message: 'Citation request is invalid.' }, { status: 400 })
+  const created = await Promise.all(body.suggestions.slice(0, 5).map((suggestion) => req.payload.create({ collection: 'ai-citations' as never, data: { content: body.contentID, observedAt: new Date().toISOString(), platform: suggestion.platform, query: suggestion.query, rationale: suggestion.rationale, status: 'suggested' } as never, overrideAccess: false, req })))
+  return Response.json({ created: created.length })
 } })
 
 const score = (document: AuditableDocument): number => {
@@ -224,7 +232,7 @@ export const seoBoostPlugin = (options: SeoBoostPluginOptions): Plugin => (confi
       ),
       ...monitoringCollections(options.collections),
     ],
-    endpoints: [...(config.endpoints || []), dashboardEndpoint(options.collections), suggestionEndpoint()],
+    endpoints: [...(config.endpoints || []), dashboardEndpoint(options.collections), suggestionEndpoint(), citationEndpoint(options.collections)],
     globals: [...(config.globals || []), settingsGlobal(options.nim)],
     admin:
       options.dashboard === false
