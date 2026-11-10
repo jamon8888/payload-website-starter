@@ -1,7 +1,8 @@
 export type AnswerBlock = { answer?: string | null; question?: string | null }
 
 export type SchemaSource = {
-  answerBlocks?: AnswerBlock[] | null
+  /** Payload form state can hold an uninitialised object before an array row exists. */
+  answerBlocks?: unknown
   canonicalURL?: string | null
   description?: string | null
   image?: unknown
@@ -28,6 +29,8 @@ const imageURL = (image: unknown): string => {
 }
 const trimTo = (value: string, maximum: number): string => value.length > maximum ? `${value.slice(0, maximum - 1).trim()}…` : value
 
+const answerBlocks = (value: unknown): AnswerBlock[] => Array.isArray(value) ? value as AnswerBlock[] : []
+
 /** Builds a recommendation only from content already authored by an editor. */
 export const buildSchemaRecommendation = (source: SchemaSource): SchemaRecommendation => {
   const title = clean(source.title) || 'Untitled page'
@@ -39,7 +42,7 @@ export const buildSchemaRecommendation = (source: SchemaSource): SchemaRecommend
   const isArticle = Boolean(clean(source.publishedAt))
   const schemaType = clean(source.schemaType) || (isArticle ? 'Article' : 'WebPage')
   const language = clean(source.locale).replace('_', '-') || undefined
-  const answers = (source.answerBlocks || []).filter((item) => clean(item.question) && clean(item.answer))
+  const answers = answerBlocks(source.answerBlocks).filter((item) => clean(item.question) && clean(item.answer))
   const schema: Record<string, unknown> = { '@context': 'https://schema.org', '@type': schemaType, name: title, description: description || undefined, image: image || undefined, inLanguage: language, url: url || undefined }
   if (isArticle) { schema.headline = title; schema.datePublished = clean(source.publishedAt) }
   if (schemaType === 'FAQPage' && answers.length) schema.mainEntity = answers.map((item) => ({ '@type': 'Question', name: clean(item.question), acceptedAnswer: { '@type': 'Answer', text: clean(item.answer) } }))

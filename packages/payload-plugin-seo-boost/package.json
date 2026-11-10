@@ -1,6 +1,6 @@
 {
   "name": "payload-plugin-seo-boost",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Safe, installable SEO editorial controls for Payload CMS 3.",
   "license": "MIT",
   "type": "module",
@@ -10,7 +10,7 @@
     "./admin": { "types": "./dist/admin.d.ts", "default": "./dist/admin.js" }
   },
   "files": ["dist"],
-  "scripts": { "build": "tsc -p tsconfig.json", "prepack": "pnpm run build" },
+  "scripts": { "build": "tsc -p tsconfig.json", "test": "node --import=tsx/esm --test test/schema.test.ts", "prepack": "pnpm run build" },
   "peerDependencies": { "@payloadcms/ui": "^3.90.0", "payload": "^3.90.0", "react": "^19.0.0", "react-dom": "^19.0.0" },
   "devDependencies": { "@payloadcms/ui": "3.90.2", "payload": "3.90.2", "react": "19.2.6", "react-dom": "19.2.6", "typescript": "5.7.3" }
 }

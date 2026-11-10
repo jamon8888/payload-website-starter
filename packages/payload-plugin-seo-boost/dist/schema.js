@@ -7,6 +7,7 @@ const imageURL = (image) => {
     return '';
 };
 const trimTo = (value, maximum) => value.length > maximum ? `${value.slice(0, maximum - 1).trim()}…` : value;
+const answerBlocks = (value) => Array.isArray(value) ? value : [];
 /** Builds a recommendation only from content already authored by an editor. */
 export const buildSchemaRecommendation = (source) => {
     const title = clean(source.title) || 'Untitled page';
@@ -18,7 +19,7 @@ export const buildSchemaRecommendation = (source) => {
     const isArticle = Boolean(clean(source.publishedAt));
     const schemaType = clean(source.schemaType) || (isArticle ? 'Article' : 'WebPage');
     const language = clean(source.locale).replace('_', '-') || undefined;
-    const answers = (source.answerBlocks || []).filter((item) => clean(item.question) && clean(item.answer));
+    const answers = answerBlocks(source.answerBlocks).filter((item) => clean(item.question) && clean(item.answer));
     const schema = { '@context': 'https://schema.org', '@type': schemaType, name: title, description: description || undefined, image: image || undefined, inLanguage: language, url: url || undefined };
     if (isArticle) {
         schema.headline = title;

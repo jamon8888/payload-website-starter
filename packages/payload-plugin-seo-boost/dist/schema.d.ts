@@ -3,7 +3,8 @@ export type AnswerBlock = {
     question?: string | null;
 };
 export type SchemaSource = {
-    answerBlocks?: AnswerBlock[] | null;
+    /** Payload form state can hold an uninitialised object before an array row exists. */
+    answerBlocks?: unknown;
     canonicalURL?: string | null;
     description?: string | null;
     image?: unknown;
