@@ -1,6 +1,9 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useField, useFormFields } from '@payloadcms/ui'
+
+import { buildSchemaRecommendation, type AnswerBlock } from './schema'
 
 type Dashboard = {
   audit: { averageScore: number; documents: number; errors: number; warnings: number }
@@ -37,3 +40,25 @@ export const SeoBoostDashboard: React.FC = () => {
 }
 
 export default SeoBoostDashboard
+
+type FieldState = { value?: unknown }
+const readField = (fields: unknown, path: string): unknown => (fields as Record<string, FieldState> | undefined)?.[path]?.value
+
+/** An editor-controlled prefill; nothing changes until it is applied and saved. */
+export const SeoBoostSchemaGenerator: React.FC = () => {
+  const fields = useFormFields((state) => state[0])
+  const social = useField<Record<string, unknown>>({ path: 'seoBoost.social' })
+  const recommendation = useMemo(() => buildSchemaRecommendation({
+    answerBlocks: (readField(fields, 'aeo.answerBlocks') || readField(fields, 'answerBlocks')) as AnswerBlock[],
+    canonicalURL: readField(fields, 'seoBoost.canonicalURL') as string,
+    description: (readField(fields, 'meta.description') || readField(fields, 'aeo.aeoSummary')) as string,
+    image: readField(fields, 'meta.image') || readField(fields, 'heroImage'),
+    locale: readField(fields, 'locale') as string,
+    publishedAt: readField(fields, 'publishedAt') as string,
+    schemaType: readField(fields, 'seoBoost.social.schemaType') as string,
+    slug: readField(fields, 'slug') as string,
+    title: (readField(fields, 'meta.title') || readField(fields, 'title')) as string,
+  }), [fields])
+  const apply = () => social.setValue({ ...(social.value || {}), ogTitle: recommendation.ogTitle, ogDescription: recommendation.ogDescription, ogImageURL: recommendation.ogImageURL, schemaType: recommendation.schemaType, schemaJSON: recommendation.schema })
+  return <section aria-label="Schema recommendation" style={{ border: '1px solid var(--theme-elevation-150)', borderRadius: 8, marginBlock: '1rem', padding: '1rem' }}><strong>Préremplir depuis la page</strong><p>Utilise le titre, la description, le slug, l’image et les réponses déjà saisies. Vérifie les données avant d’enregistrer.</p><button type="button" onClick={apply}>Appliquer la recommandation</button><details><summary>Aperçu JSON-LD</summary><pre style={{ overflowX: 'auto', whiteSpace: 'pre-wrap' }}>{JSON.stringify(recommendation.schema, null, 2)}</pre></details></section>
+}

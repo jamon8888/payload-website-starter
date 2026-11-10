@@ -1,3 +1,4 @@
+export { buildSchemaRecommendation } from './schema';
 const authenticated = ({ req }) => Boolean(req.user);
 const seoBoostFields = [
     { name: 'focusKeyword', type: 'text', label: 'Focus keyword' },
@@ -34,6 +35,7 @@ const seoBoostFields = [
                 options: ['WebPage', 'Article', 'Organization', 'LocalBusiness', 'Product', 'Service', 'FAQPage', 'Event'],
             },
             { name: 'schemaJSON', type: 'json', label: 'JSON-LD (review before publishing)' },
+            { name: 'schemaGenerator', type: 'ui', admin: { components: { Field: 'payload-plugin-seo-boost/admin#SeoBoostSchemaGenerator' } } },
         ],
     },
 ];

@@ -1,5 +1,8 @@
 import type { CollectionConfig, Config, Endpoint, Field, Plugin } from 'payload'
 
+export { buildSchemaRecommendation } from './schema'
+export type { AnswerBlock, SchemaRecommendation, SchemaSource } from './schema'
+
 export type SeoBoostPluginOptions = {
   /** Payload collection slugs that receive the SEO Boost editor tab. */
   collections: string[]
@@ -50,6 +53,7 @@ const seoBoostFields: Field[] = [
         options: ['WebPage', 'Article', 'Organization', 'LocalBusiness', 'Product', 'Service', 'FAQPage', 'Event'],
       },
       { name: 'schemaJSON', type: 'json', label: 'JSON-LD (review before publishing)' },
+      { name: 'schemaGenerator', type: 'ui', admin: { components: { Field: 'payload-plugin-seo-boost/admin#SeoBoostSchemaGenerator' } } },
     ],
   },
 ]

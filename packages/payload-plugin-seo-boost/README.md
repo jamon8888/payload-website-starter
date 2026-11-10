@@ -34,6 +34,12 @@ pnpm payload migrate:create
 pnpm payload migrate
 ```
 
+In the **SEO Boost** tab, “Préremplir depuis la page” proposes Open Graph
+values and JSON-LD from title, meta description (or AEO summary), slug/canonical
+URL, image, publication date and Q&A blocks already present in the form. It
+never invents local-business facts, reviews, ratings or an address; the editor
+must explicitly apply and save the recommendation.
+
 En production : sauvegarder PostgreSQL, déployer une release vérifiée, appliquer
 la migration une seule fois, puis basculer le trafic. Ne pas utiliser de schéma
 automatique, de commande de seed ou de migration `down` comme procédure

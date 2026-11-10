@@ -11,6 +11,6 @@
   },
   "files": ["dist"],
   "scripts": { "build": "tsc -p tsconfig.json", "prepack": "pnpm run build" },
-  "peerDependencies": { "payload": "^3.90.0", "react": "^19.0.0", "react-dom": "^19.0.0" },
-  "devDependencies": { "payload": "3.90.2", "react": "19.2.6", "react-dom": "19.2.6", "typescript": "5.7.3" }
+  "peerDependencies": { "@payloadcms/ui": "^3.90.0", "payload": "^3.90.0", "react": "^19.0.0", "react-dom": "^19.0.0" },
+  "devDependencies": { "@payloadcms/ui": "3.90.2", "payload": "3.90.2", "react": "19.2.6", "react-dom": "19.2.6", "typescript": "5.7.3" }
 }

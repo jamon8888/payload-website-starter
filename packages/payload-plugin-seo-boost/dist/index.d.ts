@@ -1,4 +1,6 @@
 import type { Plugin } from 'payload';
+export { buildSchemaRecommendation } from './schema';
+export type { AnswerBlock, SchemaRecommendation, SchemaSource } from './schema';
 export type SeoBoostPluginOptions = {
     /** Payload collection slugs that receive the SEO Boost editor tab. */
     collections: string[];
