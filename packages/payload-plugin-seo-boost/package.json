@@ -1,6 +1,6 @@
 {
   "name": "payload-plugin-seo-boost",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Safe, installable SEO editorial controls for Payload CMS 3.",
   "license": "MIT",
   "type": "module",
